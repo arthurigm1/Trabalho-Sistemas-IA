@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,18 @@
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    
-    <header class="sidebar">
-    <ul class="list">
 
-        <li>Variaveis</li>
-        <li>Regras</li>
-        <li>Perguntas</li>
-        <li>Informacoes</li>
-    </ul>
-   </header>
+<body>
+
+    <header class="sidebar">
+        <ul class="list">
+
+            <li>Variaveis</li>
+            <li>Regras</li>
+            <li>Perguntas</li>
+            <li>Informacoes</li>
+        </ul>
+    </header>
     <main class="main">
         <section id="Variaveis">
             <h1>Variaveis</h1>
@@ -27,31 +29,47 @@
             </div>
 
 
-            <form action="">
+            <form action="" id="formvar">
                 <label for="forname">Variavel</label>
-                <input type="text"
-                name="forname"
-                required
-                />
-                <select name="Tipo" id="tipo">
+                <input type="text" name="formname" id="formname" required />
+                <select name="Tipo" id="Tipo">
                     <option value="1">Multivalorada</option>
                     <option value="2">Univalorada</option>
                     <option value="3">Numerico</option>
                 </select>
-                <input type="text"
-                label="Valor"
-                required
-                />
 
-                <button>Salvar</button></form>
+                <button type="button" id="buttonsalvar">Salvar</button>
+            </form>
+
+            <form action="" id="valoresform">
+                <label for="formvalor">Valor</label>
+                <input type="text" name="formvalor" id="formvalor" required />
+                <input type="hidden" name="index" id="index" value="">
+                <button type="button" id="buttonvalor">Salvar</button>
+                <button type="button" id="buttonfinalizar">Finalizar</button>
+
+
+            </form>
         </section>
         <section id="Regras">
             <h1>Regras</h1>
             <form action=""><button>Salvar</button></form>
         </section>
         <section id="Perguntas">
-            <h1>Perguntas</h1>
-            <form action=""><button>Salvar</button></form>
+
+            <div id="perguntascontainer">
+                <h2>Variaveis</h2>
+                <ul id="perguntalist"></ul>
+
+            </div>
+
+            
+            <form action="" id="perguntasform">
+                <label for="perguntaform">Pergunta</label>
+                <input type="text" name="perguntaform" id="perguntaform" required />
+                <input type="hidden" name="index2" id="index2" value="">
+                <button type="button" id="buttopergunta">Salvar</button>
+            </form>
         </section>
         <section id="Informacoes">
             <h1>Informacoes</h1>
@@ -60,8 +78,9 @@
         <div class="iniciarbtn">
             <button>Iniciar</button>
         </div>
-        
+
     </main>
     <script src="script.js"></script>
 </body>
+
 </html>
