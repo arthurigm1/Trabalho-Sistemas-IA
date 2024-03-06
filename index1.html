@@ -1,86 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sistema especialista</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous" />
+        <link rel="stylesheet" href="reset.css" />
+        <link rel="stylesheet" href="styles.css" />
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema especialista</title>
-    <link rel="stylesheet" href="reset.css">
-    <link rel="stylesheet" href="styles.css">
-</head>
+    <body>
+        <header class="sidebar">
+            <ul class="list">
+                <li class="btn btn-success">Inicio</li>
+                <li class="btn btn-success">Variaveis</li>
+                <li class="btn btn-success">Regras</li>
+                <li class="btn btn-success">Perguntas</li>
+            </ul>
+        </header>
+        <main class="main">
+            <section id="Inicio">
+                <div class="iniciodiv">
+                    <img src="transferir.png" />
+                    <p>
+                        Projeto Desenvolvido por Arthur Ignacio Martins
+                        <br />
+                        Software de criacao de sistemas especialistas
+                    </p>
+                </div>
+            </section>
 
-<body>
+            <section id="Variaveis">
+                <h1>Variaveis</h1>
+                <div id="variaveiscontainer">
+                    <ul id="variavelist"></ul>
+                    <ul id="valores"></ul>
+                </div>
 
-    <header class="sidebar">
-        <ul class="list">
+                <form action id="formvar">
+                    <label for="forname">Variavel</label>
+                    <input type="text" name="formname" id="formname" required />
+                    <select name="Tipo" id="Tipo">
+                        <option value="1">Multivalorada</option>
+                        <option value="2">Univalorada</option>
+                        <option value="3">Numerico</option>
+                    </select>
 
-            <li>Variaveis</li>
-            <li>Regras</li>
-            <li>Perguntas</li>
-            <li>Informacoes</li>
-        </ul>
-    </header>
-    <main class="main">
-        <section id="Variaveis">
-            <h1>Variaveis</h1>
-            <div id="variaveiscontainer">
-                <ul id="variavelist"></ul>
-                <ul id="valores"></ul>
-            </div>
+                    <button type="button" id="buttonsalvar">Salvar</button>
+                </form>
 
+                <form action id="valoresform">
+                    <label for="formvalor">Valor</label>
+                    <input type="text" name="formvalor" id="formvalor"
+                        required />
+                    <input type="hidden" name="index" id="index" value />
+                    <button type="button" id="buttonvalor">Salvar</button>
+                    <button type="button"
+                        id="buttonfinalizar">Finalizar</button>
+                </form>
+            </section>
+            <section id="Regras">
+                <h1>Regras</h1>
 
-            <form action="" id="formvar">
-                <label for="forname">Variavel</label>
-                <input type="text" name="formname" id="formname" required />
-                <select name="Tipo" id="Tipo">
-                    <option value="1">Multivalorada</option>
-                    <option value="2">Univalorada</option>
-                    <option value="3">Numerico</option>
-                </select>
+                <form action id="regrasform">
+                    <fieldset class="w-100">
+                        <legend>Item Regra</legend>
+                        <div class="container-fluid">
+                            <div
+                                class="row justify-content-center align-items-center g-2">
+                                <div class="col">
+                                    <select
+                                        class="form-select form-select-lg"
+                                        name="regvariavel"
+                                        id="regvariavel"></select>
+                                </div>
+                                <div class="col">
+                                    <select
+                                        class="form-select form-select-lg"
+                                        name="regoperador"
+                                        id="regoperador">
+                                        <option value="!=">Diferente</option>
+                                        <option value="=">Igual</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <select
+                                        class="form-select form-select-lg"
+                                        name="regvalores"
+                                        id="regvalores"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
 
-                <button type="button" id="buttonsalvar">Salvar</button>
-            </form>
+                    <div class="container-fluid">
+                        <div
+                            class="row justify-content-center align-items-center g-2">
+                            <div class="col">
+                                <button type="button" name="buttonregra"
+                                    id="buttonregra" class="btn btn-primary">
+                                    Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            <section id="Perguntas">
+                <div id="perguntascontainer">
+                    <h2>Variaveis</h2>
+                    <ul id="perguntalist"></ul>
+                    <h3 id="exibirperg"></h3>
+                </div>
 
-            <form action="" id="valoresform">
-                <label for="formvalor">Valor</label>
-                <input type="text" name="formvalor" id="formvalor" required />
-                <input type="hidden" name="index" id="index" value="">
-                <button type="button" id="buttonvalor">Salvar</button>
-                <button type="button" id="buttonfinalizar">Finalizar</button>
-
-
-            </form>
-        </section>
-        <section id="Regras">
-            <h1>Regras</h1>
-            <form action=""><button>Salvar</button></form>
-        </section>
-        <section id="Perguntas">
-
-            <div id="perguntascontainer">
-                <h2>Variaveis</h2>
-                <ul id="perguntalist"></ul>
-
-            </div>
-
-            
-            <form action="" id="perguntasform">
-                <label for="perguntaform">Pergunta</label>
-                <input type="text" name="perguntaform" id="perguntaform" required />
-                <input type="hidden" name="index2" id="index2" value="">
-                <button type="button" id="buttopergunta">Salvar</button>
-            </form>
-        </section>
-        <section id="Informacoes">
-            <h1>Informacoes</h1>
-            <form action=""><button>Salvar</button></form>
-        </section>
-        <div class="iniciarbtn">
-            <button>Iniciar</button>
-        </div>
-
-    </main>
-    <script src="script.js"></script>
-</body>
-
+                <form action id="perguntasform">
+                    <label for="perguntaform">Pergunta</label>
+                    <input type="text" name="perguntaform" id="perguntaform"
+                        required />
+                    <input type="hidden" name="index2" id="index2" value />
+                    <button type="button" id="buttopergunta">Salvar</button>
+                </form>
+            </section>
+        </main>
+        <script src="script.js"></script>
+    </body>
 </html>

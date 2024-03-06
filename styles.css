@@ -3,7 +3,13 @@ body {
     flex-direction: row;
     gap: 1rem;
     padding: 1rem;
-    height: 100vh;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  font-family: 'Inter', sans-serif;
 }
 
 .sidebar {
@@ -13,6 +19,7 @@ body {
     height: 100%;
     padding: 1rem;
     border-radius: 16px;
+    
 
 }
 
@@ -21,7 +28,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    border: 1px solid rgba(0, 0, 0, 0.5);
+    
     justify-content: space-between;
     padding: 1rem;
 
@@ -37,12 +44,13 @@ body {
 }
 
 .list li {
-
+    color: #000000;
     cursor: pointer;
     padding: 1rem;
-    border: 1px solid rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(145, 231, 159, 0.5);
     border-radius: 16px;
 }
+
 
 .main section:not(:first-child) {
     display: none;
@@ -50,7 +58,7 @@ body {
 }
 
 #Variaveis {
-    display: flex;
+    
     flex-direction: column;
     gap: 1rem;
 }
@@ -117,3 +125,24 @@ body {
     padding: 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 }
+
+h1 {  		
+    color: #ff0000;  	
+ }  
+ .iniciodiv {
+    display: inline-block; /* Permite centralizar a div */
+    text-align: left; /* Alinha o texto dentro da div à esquerda */
+}
+
+.iniciodiv p {
+    text-align: center; /* Centraliza o texto dentro da div */
+}
+
+.iniciodiv img {
+    display: block; /* Para alinhar a imagem ao centro */
+    margin: 0 auto; /* Centraliza a imagem horizontalmente */
+}
+ #Inicio {
+    text-align: center; 
+}
+
