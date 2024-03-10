@@ -56,7 +56,7 @@
         document.getElementById("regvariavel").addEventListener("change", preenchevalor)
         preencheregra()
 
-        document.getElementById("buttonregra").addEventListener("click" , (evente) =>{
+        document.getElementById("buttonregra").addEventListener("click", (evente) => {
 
         })
       }
@@ -68,10 +68,14 @@
 
   document.getElementById("buttonsalvar").addEventListener("click", (evente) => {
     const data = new FormData(formvar);
-    variaveis.push({ name: data.get("formname"), tipo: data.get("Tipo"), valores: [], pergunta: "" })
-    formvar.reset()
+    if (data.get("formname") == "") {
+      alert("Preencha um valor")
+    } else {
+      variaveis.push({ name: data.get("formname"), tipo: data.get("Tipo"), valores: [], pergunta: "" })
+      formvar.reset()
 
-    encherVar();
+      encherVar();
+    }
   });
 
   function encherVar() {
@@ -89,24 +93,53 @@
         valoresform.style.display = "flex"
 
         preencherValores();
+        e
       })
       list.appendChild(item);
 
     }
   }
+  document.getElementById("buttonvalordelete").addEventListener("click", (event) => {
+    const valorApagar = document.getElementById("valores").value;
+
+
+    for (const variavel of variaveis) {
+      const item = document.createElement("li")
+      item.innerHTML = variavel.name
+      const apagar = item.addEventListener("click", (variavelclick) => {
+        const target = document.querySelector("#index").value;
+        variaveis = variaveis.map((item) => {
+          if (target === item.name) {
+            const novosValores = item.valores.filter(valor => valor !== valorApagar);
+            return { ...item, valores: novosValores };
+          }
+          return item;
+        });
+        preencherValores();
+      })
+    }
+
+
+
+
+  });
+
   document.getElementById("buttonvalor").addEventListener("click", (evente) => {
     const data = new FormData(valoresform);
     const target = document.querySelector("#index").value
 
-    variaveis = variaveis.map((item) => {
-      if (target === item.name) {
-        return { ...item, valores: [...item.valores, data.get("formvalor")] }
-      }
-      return item;
-    })
-    valoresform.reset()
-    preencherValores();
-
+    if (data.get("formvalor") == "") {
+      alert("Preencha um valor")
+    } else {
+      variaveis = variaveis.map((item) => {
+        if (target === item.name) {
+          return { ...item, valores: [...item.valores, data.get("formvalor")] }
+        }
+        return item;
+      })
+      valoresform.reset()
+      preencherValores();
+    }
   });
 
   document.getElementById("buttonfinalizar").addEventListener("click", (evente) => {
@@ -134,6 +167,7 @@
     }
 
   }
+
 
   function preenchePergunta() {
     const list = document.getElementById("perguntalist")
@@ -178,17 +212,17 @@
         option.textContent = valor
         regravalor.appendChild(option)
       }
-      
+
 
     }
-    else if(tipo == "2"){
+    else if (tipo == "2") {
       regravalor.innerHTML = `
       <option value selected>Desconhecido</option>
       <option value="1" >Sim</option>
       <option value="2" >Nao</option>
       `
     }
-        else if(tipo == "3"){
+    else if (tipo == "3") {
       regravalor.innerHTML = `
       <option value selected>Desconhecido</option>
       <option value="1" >0</option>
@@ -197,12 +231,12 @@
     }
 
   }
-  function salvarregra(e){
+  function salvarregra(e) {
     const regrasform = document.getElementById("regrasform")
     const data = new FormData(regrasform)
-    regras = [...regras,{variavel: data.get("regvariavel"), operador: data.get("regoperador"), valor: data.get("regvalores")}]
+    regras = [...regras, { variavel: data.get("regvariavel"), operador: data.get("regoperador"), valor: data.get("regvalores") }]
     console.log(regras)
-    localStorage.setItem("regras" , JSON.stringify(regras))
+    localStorage.setItem("regras", JSON.stringify(regras))
   }
 
 
