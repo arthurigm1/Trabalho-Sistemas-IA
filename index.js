@@ -185,17 +185,32 @@
     function preenchePergunta() {
         const list = document.getElementById('perguntalist');
         list.innerHTML = '';
-
         for (const item of variaveis) {
             const li = document.createElement('li');
             li.innerHTML = item?.name;
-
             li.addEventListener('click', () => {
                 document.querySelector('#index2').value = item?.name;
-                document.querySelector('#exibirperg').textContent = item?.pergunta;
+                if (item?.pergunta) {
+                    document.querySelector('#exibirperg').textContent = item?.pergunta;
+                    const icon = document.createElement("i")
+                    icon.classList.add('fa-solid')
+                    icon.classList.add('fa-trash')
+                    icon.setAttribute('role', 'button')
+                    icon.addEventListener('click', e => {
+                        variaveis = variaveis.map((variavel) => {
+                            if (variavel.name === item?.name) {
+                                return {...variavel, pergunta: ""}
+                            }
+                            return variavel
+                        })
+                        atualizaCache()
+                        document.querySelector('#exibirperg').innerHTML = ""
+                        e.preventDefault()
+                    })
+                    document.querySelector('#exibirperg').appendChild(icon)
+                }
             });
             list.appendChild(li);
-
         }
 
     }
