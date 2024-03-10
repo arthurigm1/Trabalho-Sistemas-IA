@@ -1,36 +1,36 @@
 (() => {
-    let variaveis = [];
     let regras = JSON.parse(localStorage.getItem('regras')) || [];
+    let variaveis = JSON.parse(localStorage.getItem('variaveis')) || [];
+    console.log({regras,variaveis})
+    function atualizaCache() {
+        localStorage.setItem("variaveis", JSON.stringify(variaveis))
+        localStorage.setItem("regras", JSON.stringify(regras))
+    }
+
     const valoresform = document.getElementById('valoresform');
     const formvar = document.getElementById('formvar');
     const formperg = document.getElementById('perguntasform');
 
     const adicionaperg = (e) => {
-
         const target = document.getElementById('index2').value;
         const data = new FormData(formperg);
         const pergunta = data.get('perguntaform');
-        console.log('salvando', {target});
 
         if (target != '' && pergunta != '') {
             variaveis = variaveis.map((item) => {
-
                 if (target === item.name) {
-
                     formperg.reset();
-
                     return {
                         ...item, pergunta
                     };
-
                 }
                 return item;
             });
+            atualizaCache()
 
         } else if (target == '') {
             alert('Selecione uma variavel');
         }
-        console.log({variaveis});
 
         preenchePergunta();
         e.preventDefault();
@@ -54,7 +54,7 @@
                     .addEventListener('click', adicionaperg);
 
             }
-            if (evente.target.textContent == 'Regras') {
+            if (evente.target.textContent === 'Regras') {
                 document.getElementById('regvariavel')
                     .addEventListener('change', preenchevalor);
                 preencheregra();
@@ -64,6 +64,10 @@
 
                     });
             }
+            if (evente.target.textContent === 'Variaveis') {
+                preencheVariaveis()
+            }
+
 
         });
     }
@@ -78,32 +82,31 @@
                 variaveis.push({
                     name: data.get('formname'), tipo: data.get('Tipo'), valores: [], pergunta: ''
                 });
+                atualizaCache()
                 formvar.reset();
 
-                encherVar();
+                preencheVariaveis();
             }
         });
 
-    function encherVar() {
+    function preencheVariaveis() {
         const list = document.getElementById('variavelist');
         list.innerHTML = '';
+        console.log('preencheVariaveis',{variaveis})
         for (const variavel of variaveis) {
             const item = document.createElement('li');
             item.innerHTML = variavel.name;
             item.addEventListener('click', (variavelclick) => {
-
                 const teste = document.querySelector('#index');
                 teste.value = variavel.name;
-
                 formvar.style.display = 'none';
                 valoresform.style.display = 'flex';
-
                 preencherValores();
-                e;
             });
             list.appendChild(item);
 
         }
+
     }
 
     document.getElementById('buttonvalordelete')
@@ -146,6 +149,7 @@
                     }
                     return item;
                 });
+                atualizaCache()
                 valoresform.reset();
                 preencherValores();
             }
@@ -189,8 +193,6 @@
             li.addEventListener('click', (evente) => {
                 document.querySelector('#index2').value = item.name;
                 document.querySelector('#exibirperg').textContent = item.pergunta;
-                console.log(item);
-
             });
             list.appendChild(li);
 
@@ -247,8 +249,7 @@
         regras = [...regras, {
             variavel: data.get('regvariavel'), operador: data.get('regoperador'), valor: data.get('regvalores')
         }];
-        console.log(regras);
-        localStorage.setItem('regras', JSON.stringify(regras));
+        atualizaCache()
     }
 
 })();
