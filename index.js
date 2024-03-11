@@ -10,7 +10,6 @@
     const valoresform = document.getElementById('valoresform');
     const formvar = document.getElementById('formvar');
     const formperg = document.getElementById('perguntasform');
-
     const adicionaperg = (e) => {
         const target = document.getElementById('index2').value;
         const data = new FormData(formperg);
@@ -57,12 +56,10 @@
             if (evente.target.textContent === 'Regras') {
                 document.getElementById('regvariavel')
                     .addEventListener('change', preenchevalor);
+                document.getElementById("regrasform").addEventListener("submit", adicionarCondicao)
+                document.getElementById("adicionaregra").addEventListener("click", adicionarRegra)
                 preencheregra();
-
-                document.getElementById('buttonregra')
-                    .addEventListener('click', () => {
-
-                    });
+                preencheListaDeRegras()
             }
             if (evente.target.textContent === 'Variaveis') {
                 preencheVariaveis()
@@ -92,7 +89,6 @@
     function preencheVariaveis() {
         const list = document.getElementById('variavelist');
         list.innerHTML = '';
-        console.log('preencheVariaveis', {variaveis})
         for (const variavel of variaveis) {
             const item = document.createElement('li');
             item.innerHTML = variavel?.name;
@@ -109,29 +105,30 @@
 
     }
 
-    document.getElementById('buttonvalordelete')
-        .addEventListener('click', () => {
-            // const valorApagar = document.getElementById('valores').value;
+    /*
+        document.getElementById('buttonvalordelete')
+            .addEventListener('click', () => {
+                // const valorApagar = document.getElementById('valores').value;
 
-            for (const variavel of variaveis) {
-                const item = document.createElement('li');
-                item.innerHTML = variavel?.name;
-                /*   const apagar = item.addEventListener('click', (variavelclick) => {
-                       const target = document.querySelector('#index').value;
-                       variaveis = variaveis.map((item) => {
-                           if (target === item?.name) {
-                               const novosValores = item.valores.filter(valor => valor !== valorApagar);
-                               return {
-                                   ...item, valores: novosValores
-                               };
-                           }
-                           return item;
+                for (const variavel of variaveis) {
+                    const item = document.createElement('li');
+                    item.innerHTML = variavel?.name;
+                       const apagar = item.addEventListener('click', (variavelclick) => {
+                           const target = document.querySelector('#index').value;
+                           variaveis = variaveis.map((item) => {
+                               if (target === item?.name) {
+                                   const novosValores = item.valores.filter(valor => valor !== valorApagar);
+                                   return {
+                                       ...item, valores: novosValores
+                                   };
+                               }
+                               return item;
+                           });
+                           preencherValores();
                        });
-                       preencherValores();
-                   });*/
-            }
+                }
 
-        });
+            });*/
 
     document.getElementById('buttonvalor')
         .addEventListener('click', () => {
@@ -182,6 +179,36 @@
 
     }
 
+    function preenchevalor(e) {
+        const target = e.target.value;
+        const {
+            valores = [], tipo = ''
+        } = variaveis.find(({name}) => (name === target)) || {};
+        const regravalor = document.getElementById('regvalores');
+        regravalor.innerHTML = `<option value selected>Desconhecido</option>`;
+        if (tipo === '1') {
+            for (const valor of valores) {
+                const option = document.createElement('option');
+                option.value = valor;
+                option.textContent = valor;
+                regravalor.appendChild(option);
+            }
+
+        } else if (tipo === '2') {
+            regravalor.innerHTML = `
+      <option value selected>Desconhecido</option>
+      <option value="1" >Sim</option>
+      <option value="2" >Nao</option>
+      `;
+        } else if (tipo === '3') {
+            regravalor.innerHTML = `
+      <option value selected>Desconhecido</option>
+      <option value="1" >0</option>
+      <option value="2" >1</option>
+      `;
+        }
+    }
+
     function preenchePergunta() {
         const list = document.getElementById('perguntalist');
         list.innerHTML = '';
@@ -227,45 +254,124 @@
 
     }
 
-    function preenchevalor(e) {
-        const target = e.target.value;
-        const {
-            valores = [], tipo = ''
-        } = variaveis.find(({name}) => (name === target)) || {};
-        const regravalor = document.getElementById('regvalores');
-        regravalor.innerHTML = `<option value selected>Desconhecido</option>`;
-        if (tipo === '1') {
-            for (const valor of valores) {
-                const option = document.createElement('option');
-                option.value = valor;
-                option.textContent = valor;
-                regravalor.appendChild(option);
-            }
-
-        } else if (tipo === '2') {
-            regravalor.innerHTML = `
-      <option value selected>Desconhecido</option>
-      <option value="1" >Sim</option>
-      <option value="2" >Nao</option>
-      `;
-        } else if (tipo === '3') {
-            regravalor.innerHTML = `
-      <option value selected>Desconhecido</option>
-      <option value="1" >0</option>
-      <option value="2" >1</option>
-      `;
-        }
+    function preencheListaDeRegras() {
+        const listaDeRegras = document.getElementById("listaDeRegras")
+        listaDeRegras.innerHTML = ''
+        const accordionFlushExample = document.createElement("div")
+        accordionFlushExample.classList.add("accordion")
+        accordionFlushExample.classList.add("accordion-flush")
+        accordionFlushExample.id = "accordionFlushExample"
+        accordionFlushExample.innerHTML = geraTabelaDeRegras(regras)
+        listaDeRegras.appendChild(accordionFlushExample)
 
     }
 
-    /*    function salvarregra(e) {
-            const regrasform = document.getElementById('regrasform');
-            const data = new FormData(regrasform);
-            regras = [...regras, {
-                variavel: data.get('regvariavel'), operador: data.get('regoperador'), valor: data.get('regvalores')
-            }];
-            atualizaCache()
-        }*/
+    function adicionarRegra(e) {
+        regras = [...regras, {se: [], entao: []}]
+        atualizaCache()
+        preencheListaDeRegras()
+        e.preventDefault()
+    }
+
+    function adicionarCondicao(e) {
+        const regrasform = document.getElementById('regrasform');
+        const data = new FormData(regrasform);
+        regras = regras.map(function (value, index) {
+            if ((index + 1) === regras.length || regras.length === 0) {
+                return {
+                    ...value, se: [...value.se, {
+                        variavel: data.get('regvariavel'),
+                        operador: data.get('regoperador'),
+                        valor: data.get('regvalores')
+                    }]
+                }
+            }
+            return value
+        })
+        regrasform.reset()
+        atualizaCache()
+        preencheListaDeRegras()
+        e.preventDefault()
+        return false
+    }
+
+    function geraTabelaDeRegras(regras = []) {
+        if (!Array.isArray(regras) || (Array.isArray(regras) && !regras.length)) {
+            return ""
+        }
+
+        function geraLinhaDaTabelaSE(linhas = []) {
+            if (!Array.isArray(linhas) || (Array.isArray(linhas) && !linhas.length)) {
+                return ""
+            }
+            return linhas.reduce(function cb(previousValue, {variavel, operador, valor}, currentIndex) {
+                return previousValue.concat(`<tr>
+                           <th scope="row">${currentIndex + 1}</th>
+                            <td>${variavel}</td>
+                            <td>${operador}</td>
+                            <td>${valor}</td>
+                         </tr>`)
+            }, '')
+        }
+
+        function geraLinhaDaTabelaENTAO(linhas = []) {
+            if (!Array.isArray(linhas) || (Array.isArray(linhas) && !linhas.length)) {
+                return ""
+            }
+            return linhas.reduce(function cb(previousValue, {variavel, valor}, currentIndex) {
+                return previousValue.concat(`<tr>
+                            <th scope="row">${currentIndex + 1}</th>
+                            <td>${variavel}</td>
+                            <td>${valor}</td>
+                         </tr>`)
+            }, '')
+        }
+
+        return regras.reduce(function (previousValue, {se, entao}, currentIndex) {
+            return previousValue.concat(`<div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button aria-controls="flush-collapseOne-${currentIndex + 1}" aria-expanded="false" class="accordion-button collapsed"
+                                data-bs-target="#flush-collapseOne-${currentIndex + 1}" data-bs-toggle="collapse"
+                                type="button">
+                            Regra ${currentIndex + 1}
+                        </button>
+                    </h2>
+                    <div class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample"
+                         id="flush-collapseOne-${currentIndex + 1}">
+                        <div class="accordion-body">
+                        <h3  class="h3">Se</h3>
+                         <table class="table table-dark  table-striped rounded table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Variavel</th>
+                                    <th scope="col">Operador</th>
+                                    <th scope="col">Valor</th>
+                                    </tr>
+                            </thead>
+                            <tbody>
+                                ${geraLinhaDaTabelaSE(se)}
+                            </tbody>
+                         </table>       
+                         <h3 class="h3">então</h3>      
+                         <table class="table table-dark  table-striped rounded table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Variavel</th>
+                                    <th scope="col">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${geraLinhaDaTabelaENTAO(entao)}
+                            </tbody>
+                         </table>
+                        </div>
+                    </div>
+                </div>`)
+        }, '')
+
+    }
 
 })();
 
