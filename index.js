@@ -112,12 +112,8 @@
                 valoresform.style.display = 'flex';
                 preencherValores();
             });
-            const icon = document.createElement("i")
-            icon.classList.add('fa-solid')
-            icon.classList.add('fa-trash')
-            icon.classList.add('text-danger')
+            const icon = deleteIcon()
             icon.classList.add('ms-2')
-            icon.setAttribute('role', 'button')
             icon.onclick = e => {
                 variaveis = variaveis.filter(({name}) => name !== variavel?.name)
                 regras = regras.filter(({se, entao}) => {
@@ -169,6 +165,15 @@
 
         });
 
+    function deleteIcon() {
+        const icon = document.createElement("i")
+        icon.classList.add('fa-solid')
+        icon.classList.add('fa-trash')
+        icon.classList.add('text-danger')
+        icon.setAttribute('role', 'button')
+        return icon
+    }
+
     function preencherValores() {
         const target = document.querySelector('#index').value;
         const find = variaveis.find((item) => item?.name === target);
@@ -178,6 +183,27 @@
             for (const item of find.valores) {
                 const li = document.createElement('li');
                 li.innerHTML = item;
+                const icon = deleteIcon()
+                icon.classList.add('ms-2')
+                icon.onclick = e => {
+                    variaveis = variaveis.map((it, index) => {
+                        if (it?.name === target) {
+                            return {
+                                ...it, valores: it.valores.filter((value) => value !== item)
+                            }
+                        }
+                        return it;
+                    })
+                    regras = regras.filter(({se, entao}) => {
+                        const seCheck = se.some(({valor: valorSe}) => valorSe === item)
+                        const entaoCheck = entao.some(({valor: valorEntao}) => valorEntao === item)
+                        return !(seCheck || entaoCheck);
+                    })
+                    atualizaCache()
+                    preencherValores()
+                    e.preventDefault()
+                }
+                li.appendChild(icon)
                 list.appendChild(li);
 
             }
@@ -225,12 +251,8 @@
                 document.querySelector('#index2').value = item?.name;
                 if (item?.pergunta) {
                     document.querySelector('#exibirperg').textContent = item?.pergunta;
-                    const icon = document.createElement("i")
-                    icon.classList.add('fa-solid')
-                    icon.classList.add('fa-trash')
-                    icon.classList.add('text-danger')
+                    const icon = deleteIcon()
                     icon.classList.add('ms-2')
-                    icon.setAttribute('role', 'button')
                     icon.addEventListener('click', e => {
                         variaveis = variaveis.map((variavel) => {
                             if (variavel.name === item?.name) {
