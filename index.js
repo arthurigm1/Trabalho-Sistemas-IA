@@ -75,7 +75,6 @@
         });
     }
 
-
     document.getElementById('buttonsalvar')
         .addEventListener('click', () => {
             const data = new FormData(formvar);
@@ -95,6 +94,20 @@
                 preencheVariaveis();
             }
         });
+
+    document.querySelector("#executa").onclick = e => {
+        const perguntas = document.querySelectorAll(".carousel-item")
+        const responderLista = document.querySelectorAll(".responder")
+        let i = 0;
+        for (let i = 0; i<responderLista.length;i++) {
+            responderLista[i].onclick = e => {
+                for (const perguntaParaRemoverStatus of perguntas) {
+                    perguntaParaRemoverStatus.classList.remove("active")
+                }
+                perguntas[i + 1].classList.add("active")
+            }
+        }
+    }
 
     function preencheVariaveis() {
         const list = document.getElementById('variavelist');

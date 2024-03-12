@@ -4,11 +4,7 @@
     <meta charset="UTF-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Sistema especialista</title>
-    <link
-            crossorigin="anonymous"
-            href="//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-            rel="stylesheet"/>
+    <link href="bootstrap.css" rel="stylesheet"/>
     <link href="reset.css" rel="stylesheet"/>
     <link href="styles.css" rel="stylesheet"/>
     <script crossorigin="anonymous" src="//kit.fontawesome.com/11d8f5be98.js"></script>
@@ -16,11 +12,16 @@
 <body>
 <header class="sidebar">
     <ul class="list">
-
         <li class="comic-button">Inicio</li>
         <li class="comic-button">Variaveis</li>
         <li class="comic-button">Regras</li>
         <li class="comic-button">Perguntas</li>
+
+        <button id="executa" class="comic-button btn border-0 " data-bs-target="#executar" data-bs-toggle="modal"
+                type="button">
+            Executar
+        </button>
+
     </ul>
 </header>
 <main class="main">
@@ -107,9 +108,9 @@
                     type="button">Salvar
             </button>
             <div class="form-check d-flex flex-row justify-center align-items-center">
-                <input class="form-check-input" type="checkbox" value="" id="objetivo" name="objetivo">
+                <input class="form-check-input" id="objetivo" name="objetivo" type="checkbox" value="">
                 <label class="form-check-label" for="objetivo">
-                   É Objetivo?
+                    É Objetivo?
                 </label>
             </div>
         </form>
@@ -206,14 +207,45 @@
         </div>
         <form action id="perguntasform">
             <input class="input" id="perguntaform" name="perguntaform"
-                   required
-                   type="text" placeholder="Digite a pergunta!"/>
+                   placeholder="Digite a pergunta!"
+                   required type="text"/>
             <input id="index2" name="index2" type="hidden" value/>
             <button class="input" id="buttopergunta"
                     type="button">Salvar
             </button>
         </form>
     </section>
+
+    <div aria-hidden="true" aria-labelledby="executarLabel" class="modal fade" id="executar" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-black" id="executarLabel">TITULO</h1>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="carouselExample" class="carousel slide">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <p role="button" class="responder">pergunta 1</p>
+                            </div>
+                            <div class="carousel-item">
+                                <p role="button" class="responder">pergunta 2</p>
+                            </div>
+                            <div class="carousel-item">
+                                <p role="button" class="responder">pergunta 3</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="button">Avançar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </main>
 <script src="index.js" type="application/javascript"></script>
 <script crossorigin="anonymous"
