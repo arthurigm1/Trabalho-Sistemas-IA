@@ -44,7 +44,7 @@
             document.getElementById('buttopergunta')
                 .removeEventListener('click', adicionaperg);
             document.getElementById('regvariavel')
-                .removeEventListener('change', preenchevalor);
+                .removeEventListener('change', preenchevalor("regvalores"));
             if (evente.target.textContent === 'Perguntas') {
 
                 preenchePergunta();
@@ -55,12 +55,28 @@
             }
             if (evente.target.textContent === 'Regras') {
                 document.getElementById('regvariavel')
-                    .addEventListener('change', preenchevalor);
-                document.getElementById("regrasform").addEventListener("submit", adicionarCondicao)
+                    .addEventListener('change', preenchevalor("regvalores"));
+                document.getElementById('entaovariavel')
+                    .addEventListener('change', preenchevalor("entaovalores"));
+                document.getElementById("condicaoForm")
+                    .addEventListener("submit", adicionarCondicao)
+                document.getElementById("entaoform")
+                    .addEventListener("submit", adicionarEntao)
                 document.getElementById("adicionaregra").addEventListener("click", adicionarRegra)
-
-                preencheregra();
+                preencheCondicoesEEntao();
                 preencheListaDeRegras()
+                const regrasBTN = document.querySelectorAll(".regra")
+                console.log({regrasBTN})
+                for (let i = 0; i < regrasBTN.length; i++) {
+                    regrasBTN[i].onclick = e => {
+                        console.log('clicou', {i})
+                        regras = regras.filter((value, index,) => index !== i)
+                        atualizaCache()
+                        preencheCondicoesEEntao();
+                        preencheListaDeRegras()
+                        e.preventDefault()
+                    }
+                }
             }
             if (evente.target.textContent === 'Variaveis') {
                 preencheVariaveis()
@@ -78,7 +94,11 @@
                 alert('Preencha um valor');
             } else {
                 variaveis.push({
-                    name: data.get('formname'), tipo: data.get('Tipo'), valores: [], pergunta: ''
+                    name: data.get('formname'),
+                    tipo: data.get('Tipo'),
+                    valores: [],
+                    pergunta: '',
+                    objetivo: document.getElementById("objetivo").checked
                 });
                 atualizaCache()
                 formvar.reset();
@@ -180,14 +200,14 @@
 
     }
 
-    function preenchevalor(e) {
+    const preenchevalor = (targetNode) => function (e) {
         const target = e.target.value;
         const {
-            valores = [], tipo = ''
+            valores = [], tipo = '', objetivo = false
         } = variaveis.find(({name}) => (name === target)) || {};
-        const regravalor = document.getElementById('regvalores');
+        const regravalor = document.getElementById(targetNode);
         regravalor.innerHTML = `<option value selected>Desconhecido</option>`;
-        if (tipo === '1') {
+        if (tipo === '1' || objetivo) {
             for (const valor of valores) {
                 const option = document.createElement('option');
                 option.value = valor;
@@ -243,7 +263,7 @@
 
     }
 
-    function preencheregra() {
+    function preencheCondicoesEEntao() {
         const regravariavel = document.getElementById('regvariavel');
         regravariavel.innerHTML = `<option value selected>Selecione Uma Variavel</option>`;
         for (const item of variaveis) {
@@ -252,10 +272,20 @@
             option.textContent = item?.name;
             regravariavel.appendChild(option);
         }
-
+        const entaovariavel = document.getElementById('entaovariavel');
+        entaovariavel.innerHTML = `<option value selected>Selecione Uma Variável</option>`;
+        for (const item of variaveis) {
+            if (item?.objetivo) {
+                const option = document.createElement('option');
+                option.value = item?.name;
+                option.textContent = item?.name;
+                entaovariavel.appendChild(option);
+            }
+        }
     }
 
     function preencheListaDeRegras() {
+        console.log({regras})
         const listaDeRegras = document.getElementById("listaDeRegras")
         listaDeRegras.innerHTML = ''
         const accordionFlushExample = document.createElement("div")
@@ -268,7 +298,7 @@
         for (let i = 0; i < listaDeRegrasCollapsed.length; i++) {
             listaDeRegrasCollapsed[i].onclick = e => {
                 document.querySelector("#regraselecionada").value = i;
-                document.querySelector("#regrasform").reset()
+                document.querySelector("#condicaoForm").reset()
                 e.preventDefault()
             }
         }
@@ -283,11 +313,10 @@
     }
 
     function adicionarCondicao(e) {
-        const regrasform = document.getElementById('regrasform');
-        const data = new FormData(regrasform);
-        const regraSelecionada = Number(document.querySelector("#regraselecionada").value)
+        const condicaoForm = document.getElementById('condicaoForm');
+        const data = new FormData(condicaoForm);
         regras = regras.map((value, index) => {
-            if ((index) === regraSelecionada) {
+            if ((index) === regraSelecionada()) {
                 return {
                     ...value, se: [...value.se, {
                         variavel: data.get('regvariavel'),
@@ -299,7 +328,34 @@
                 return value;
             }
         })
-        regrasform.reset()
+        condicaoForm.reset()
+        atualizaCache()
+        preencheListaDeRegras()
+        e.preventDefault()
+        return false
+    }
+
+    function regraSelecionada() {
+        return Number(document.querySelector("#regraselecionada").value)
+    }
+
+    function adicionarEntao(e) {
+        const entaoform = document.getElementById('entaoform');
+        const data = new FormData(entaoform);
+        regras = regras.map((value, index) => {
+            if ((index) === regraSelecionada()) {
+                return {
+                    ...value, entao: [...value.entao, {
+                        variavel: data.get('entaovariavel'),
+                        operador: data.get('entaooperador'),
+                        valor: data.get('entaovalores')
+                    }]
+                };
+            } else {
+                return value;
+            }
+        })
+        entaoform.reset()
         atualizaCache()
         preencheListaDeRegras()
         e.preventDefault()
@@ -341,6 +397,7 @@
         return regras.reduce(function (previousValue, {se, entao}, currentIndex) {
             return previousValue.concat(`<div class="accordion-item">
                     <h2 class="accordion-header">
+                     <i class="fa-solid fa-trash regra me-2" role="button"></i> 
                         <button
                             aria-controls="flush-collapseOne-${currentIndex + 1}"
                             aria-expanded="false"
@@ -349,7 +406,7 @@
                             data-bs-toggle="collapse"
                             type="button"
                         >
-                            Regra ${currentIndex + 1}
+                          Regra ${currentIndex + 1}
                         </button>
                     </h2>
                     <div class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample"

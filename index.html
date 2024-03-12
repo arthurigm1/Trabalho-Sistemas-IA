@@ -102,10 +102,16 @@
                 <option value="3">Numerico</option>
             </select>
 
+
             <button class="input" id="buttonsalvar"
                     type="button">Salvar
             </button>
-
+            <div class="form-check d-flex flex-row justify-center align-items-center">
+                <input class="form-check-input" type="checkbox" value="" id="objetivo" name="objetivo">
+                <label class="form-check-label" for="objetivo">
+                   É Objetivo?
+                </label>
+            </div>
         </form>
 
         <form action id="valoresform">
@@ -128,71 +134,70 @@
         </form>
     </section>
     <section id="Regras">
-        <h1>Regras</h1>
-        <div class="container-fluid mb-4">
-            <button class="input" id="adicionaregra">Adicionar Regra</button>
-        </div>
-        <form action id="regrasform">
-            <fieldset class="w-100 mb-4">
-                <div class="container-fluid">
-                    <h2 class="h2">Condições</h2>
-                    <div  class="row justify-content-center align-items-center g-2 mb-4">
-                        <div class="col">
-                            <select
-                                    class="form-select form-select-lg"
-                                    id="regvariavel"
-                                    name="regvariavel"></select>
-                        </div>
-                        <div class="col">
-                            <select
-                                    class="form-select form-select-lg"
-                                    id="regoperador"
-                                    name="regoperador">
-                                <option value="!=">Diferente</option>
-                                <option value="=">Igual</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select
-                                    class="form-select form-select-lg"
-                                    id="regvalores"
-                                    name="regvalores"></select>
-                        </div>
-                    </div>
-                    <button class="input mb-4" type="submit">
-                        Adicionar condição
-                    </button>
-                    <h2 class="h2">Então</h2>
-                    <div class="row justify-content-center align-items-center g-2 mb-4">
-                        <div class="col">
-                            <select
-                                    class="form-select form-select-lg"
-                                    id="entaovariavel"
-                                    name="regvariavel"></select>
-                        </div>
-                        <div class="col">
-                            <select
-                                    class="form-select form-select-lg"
-                                    id="entaooperador"
-                                    name="regoperador">
-                                <option selected value="=">Igual</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <select
-                                    class="form-select form-select-lg"
-                                    id="entaovalores"
-                                    name="regvalores"></select>
-                        </div>
-                    </div>
-                    <button class="input mb-4" type="submit">
-                        Adicionar Então
-                    </button>
-                    <input id="regraselecionada" name="regraselecionada" type="hidden">
+        <h1 class="h1 mb-4">Regras</h1>
+
+        <form action class="w-100 mb-4" id="condicaoForm">
+            <h2 class="h2">Condições</h2>
+            <div class="row justify-content-center align-items-center g-2 mb-4">
+                <div class="col">
+                    <select
+                            class="form-select form-select-lg"
+                            id="regvariavel"
+                            name="regvariavel"></select>
                 </div>
-            </fieldset>
+                <div class="col">
+                    <select
+                            class="form-select form-select-lg"
+                            id="regoperador"
+                            name="regoperador">
+                        <option value="!=">Diferente</option>
+                        <option value="=">Igual</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select
+                            class="form-select form-select-lg"
+                            id="regvalores"
+                            name="regvalores"></select>
+                </div>
+            </div>
+            <button class="input mb-4" type="submit">
+                Adicionar condição
+            </button>
+            <input id="regraselecionada" name="regraselecionada" type="hidden">
 
         </form>
+        <form action class="w-100 mb-4" id="entaoform">
+            <h2 class="h2">Então</h2>
+            <div class="row justify-content-center align-items-center g-2 mb-4">
+                <div class="col">
+                    <select
+                            class="form-select form-select-lg"
+                            id="entaovariavel"
+                            name="entaovariavel"></select>
+                </div>
+                <div class="col">
+                    <select
+                            class="form-select form-select-lg"
+                            id="entaooperador"
+                            name="entaooperador">
+                        <option selected value="=">Igual</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <select
+                            class="form-select form-select-lg"
+                            id="entaovalores"
+                            name="entaovalores"></select>
+                </div>
+            </div>
+            <button class="input mb-4" type="submit">
+                Adicionar Então
+            </button>
+        </form>
+
+        <button class="input mb-4" id="adicionaregra">Adicionar Regra</button>
+
         <div class="container-fluid" id="listaDeRegras">
 
         </div>
