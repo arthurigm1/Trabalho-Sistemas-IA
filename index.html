@@ -124,10 +124,6 @@
             <button class="input" id="buttonvalor" type="button">Salvar
                 Valor
             </button>
-            <button class="input" id="buttonvalordelete"
-                    type="button">Excluir
-                Valor
-            </button>
             <button class="input" id="buttonfinalizar"
                     type="button">Finalizar
             </button>
@@ -204,15 +200,14 @@
     </section>
     <section id="Perguntas">
         <div id="perguntascontainer">
-            <h2>Variaveis</h2>
+            <h2 class="h2">Variaveis</h2>
             <ul id="perguntalist"></ul>
-            <h3 id="exibirperg"></h3>
+            <h3 class="h3" id="exibirperg"></h3>
         </div>
         <form action id="perguntasform">
-            <label for="perguntaform">Pergunta</label>
             <input class="input" id="perguntaform" name="perguntaform"
                    required
-                   type="text"/>
+                   type="text" placeholder="Digite a pergunta!"/>
             <input id="index2" name="index2" type="hidden" value/>
             <button class="input" id="buttopergunta"
                     type="button">Salvar

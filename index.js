@@ -65,18 +65,7 @@
                 document.getElementById("adicionaregra").addEventListener("click", adicionarRegra)
                 preencheCondicoesEEntao();
                 preencheListaDeRegras()
-                const regrasBTN = document.querySelectorAll(".regra")
-                console.log({regrasBTN})
-                for (let i = 0; i < regrasBTN.length; i++) {
-                    regrasBTN[i].onclick = e => {
-                        console.log('clicou', {i})
-                        regras = regras.filter((value, index,) => index !== i)
-                        atualizaCache()
-                        preencheCondicoesEEntao();
-                        preencheListaDeRegras()
-                        e.preventDefault()
-                    }
-                }
+
             }
             if (evente.target.textContent === 'Variaveis') {
                 preencheVariaveis()
@@ -112,44 +101,40 @@
         list.innerHTML = '';
         for (const variavel of variaveis) {
             const item = document.createElement('li');
-            item.innerHTML = variavel?.name;
-            item.addEventListener('click', () => {
+            const itemBTN = document.createElement('button')
+            itemBTN.style.background = 'transparent'
+            itemBTN.style.border = 'none'
+            itemBTN.textContent = variavel?.name;
+            itemBTN.addEventListener('click', () => {
                 const teste = document.querySelector('#index');
                 teste.value = variavel?.name;
                 formvar.style.display = 'none';
                 valoresform.style.display = 'flex';
                 preencherValores();
             });
+            const icon = document.createElement("i")
+            icon.classList.add('fa-solid')
+            icon.classList.add('fa-trash')
+            icon.classList.add('text-danger')
+            icon.classList.add('ms-2')
+            icon.setAttribute('role', 'button')
+            icon.onclick = e => {
+                variaveis = variaveis.filter(({name}) => name !== variavel?.name)
+                regras = regras.filter(({se, entao}) => {
+                    const seCheck = se.some(({variavel: variavelSe}) => variavelSe === variavel?.name)
+                    const entaoCheck = entao.some(({variavel: variavelEntao}) => variavelEntao === variavel?.name)
+                    return !(seCheck || entaoCheck);
+                })
+                atualizaCache()
+                preencheVariaveis()
+                e.preventDefault()
+            }
+            item.appendChild(icon)
+            item.appendChild(itemBTN)
             list.appendChild(item);
-
         }
 
     }
-
-    /*
-        document.getElementById('buttonvalordelete')
-            .addEventListener('click', () => {
-                // const valorApagar = document.getElementById('valores').value;
-
-                for (const variavel of variaveis) {
-                    const item = document.createElement('li');
-                    item.innerHTML = variavel?.name;
-                       const apagar = item.addEventListener('click', (variavelclick) => {
-                           const target = document.querySelector('#index').value;
-                           variaveis = variaveis.map((item) => {
-                               if (target === item?.name) {
-                                   const novosValores = item.valores.filter(valor => valor !== valorApagar);
-                                   return {
-                                       ...item, valores: novosValores
-                                   };
-                               }
-                               return item;
-                           });
-                           preencherValores();
-                       });
-                }
-
-            });*/
 
     document.getElementById('buttonvalor')
         .addEventListener('click', () => {
@@ -243,6 +228,8 @@
                     const icon = document.createElement("i")
                     icon.classList.add('fa-solid')
                     icon.classList.add('fa-trash')
+                    icon.classList.add('text-danger')
+                    icon.classList.add('ms-2')
                     icon.setAttribute('role', 'button')
                     icon.addEventListener('click', e => {
                         variaveis = variaveis.map((variavel) => {
@@ -285,7 +272,6 @@
     }
 
     function preencheListaDeRegras() {
-        console.log({regras})
         const listaDeRegras = document.getElementById("listaDeRegras")
         listaDeRegras.innerHTML = ''
         const accordionFlushExample = document.createElement("div")
@@ -294,11 +280,22 @@
         accordionFlushExample.id = "accordionFlushExample"
         accordionFlushExample.innerHTML = geraTabelaDeRegras(regras)
         listaDeRegras.appendChild(accordionFlushExample)
+
         const listaDeRegrasCollapsed = document.querySelectorAll(".collapsed")
         for (let i = 0; i < listaDeRegrasCollapsed.length; i++) {
             listaDeRegrasCollapsed[i].onclick = e => {
                 document.querySelector("#regraselecionada").value = i;
                 document.querySelector("#condicaoForm").reset()
+                e.preventDefault()
+            }
+        }
+        const regrasBTN = document.querySelectorAll(".regra")
+        for (let i = 0; i < regrasBTN.length; i++) {
+            regrasBTN[i].onclick = e => {
+                regras = regras.filter((value, index,) => index !== i)
+                atualizaCache()
+                preencheCondicoesEEntao();
+                preencheListaDeRegras()
                 e.preventDefault()
             }
         }
@@ -396,8 +393,8 @@
 
         return regras.reduce(function (previousValue, {se, entao}, currentIndex) {
             return previousValue.concat(`<div class="accordion-item">
-                    <h2 class="accordion-header">
-                     <i class="fa-solid fa-trash regra me-2" role="button"></i> 
+                    <h2 class="accordion-header d-flex align-items-center ">
+                     <i class="fa-solid fa-trash regra me-2 text-danger" role="button"></i> 
                         <button
                             aria-controls="flush-collapseOne-${currentIndex + 1}"
                             aria-expanded="false"
