@@ -14,7 +14,7 @@
     <script crossorigin="anonymous" src="//kit.fontawesome.com/11d8f5be98.js"></script>
 </head>
 <body>
-<header class="sidebar input">
+<header class="sidebar">
     <ul class="list">
 
         <li class="comic-button">Inicio</li>
@@ -135,8 +135,8 @@
         <form action id="regrasform">
             <fieldset class="w-100 mb-4">
                 <div class="container-fluid">
-                    <div
-                            class="row justify-content-center align-items-center g-2">
+                    <h2 class="h2">Condições</h2>
+                    <div  class="row justify-content-center align-items-center g-2 mb-4">
                         <div class="col">
                             <select
                                     class="form-select form-select-lg"
@@ -159,18 +159,39 @@
                                     name="regvalores"></select>
                         </div>
                     </div>
+                    <button class="input mb-4" type="submit">
+                        Adicionar condição
+                    </button>
+                    <h2 class="h2">Então</h2>
+                    <div class="row justify-content-center align-items-center g-2 mb-4">
+                        <div class="col">
+                            <select
+                                    class="form-select form-select-lg"
+                                    id="entaovariavel"
+                                    name="regvariavel"></select>
+                        </div>
+                        <div class="col">
+                            <select
+                                    class="form-select form-select-lg"
+                                    id="entaooperador"
+                                    name="regoperador">
+                                <option selected value="=">Igual</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select
+                                    class="form-select form-select-lg"
+                                    id="entaovalores"
+                                    name="regvalores"></select>
+                        </div>
+                    </div>
+                    <button class="input mb-4" type="submit">
+                        Adicionar Então
+                    </button>
+                    <input id="regraselecionada" name="regraselecionada" type="hidden">
                 </div>
             </fieldset>
-            <div class="container-fluid">
-                <div
-                        class="row justify-content-center align-items-center g-2">
-                    <div class="col">
-                        <button class="input" type="submit">
-                            Salvar
-                        </button>
-                    </div>
-                </div>
-            </div>
+
         </form>
         <div class="container-fluid" id="listaDeRegras">
 

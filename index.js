@@ -58,6 +58,7 @@
                     .addEventListener('change', preenchevalor);
                 document.getElementById("regrasform").addEventListener("submit", adicionarCondicao)
                 document.getElementById("adicionaregra").addEventListener("click", adicionarRegra)
+
                 preencheregra();
                 preencheListaDeRegras()
             }
@@ -263,6 +264,14 @@
         accordionFlushExample.id = "accordionFlushExample"
         accordionFlushExample.innerHTML = geraTabelaDeRegras(regras)
         listaDeRegras.appendChild(accordionFlushExample)
+        const listaDeRegrasCollapsed = document.querySelectorAll(".collapsed")
+        for (let i = 0; i < listaDeRegrasCollapsed.length; i++) {
+            listaDeRegrasCollapsed[i].onclick = e => {
+                document.querySelector("#regraselecionada").value = i;
+                document.querySelector("#regrasform").reset()
+                e.preventDefault()
+            }
+        }
 
     }
 
@@ -276,17 +285,19 @@
     function adicionarCondicao(e) {
         const regrasform = document.getElementById('regrasform');
         const data = new FormData(regrasform);
-        regras = regras.map(function (value, index) {
-            if ((index + 1) === regras.length || regras.length === 0) {
+        const regraSelecionada = Number(document.querySelector("#regraselecionada").value)
+        regras = regras.map((value, index) => {
+            if ((index) === regraSelecionada) {
                 return {
                     ...value, se: [...value.se, {
                         variavel: data.get('regvariavel'),
                         operador: data.get('regoperador'),
                         valor: data.get('regvalores')
                     }]
-                }
+                };
+            } else {
+                return value;
             }
-            return value
         })
         regrasform.reset()
         atualizaCache()
@@ -330,9 +341,14 @@
         return regras.reduce(function (previousValue, {se, entao}, currentIndex) {
             return previousValue.concat(`<div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button aria-controls="flush-collapseOne-${currentIndex + 1}" aria-expanded="false" class="accordion-button collapsed"
-                                data-bs-target="#flush-collapseOne-${currentIndex + 1}" data-bs-toggle="collapse"
-                                type="button">
+                        <button
+                            aria-controls="flush-collapseOne-${currentIndex + 1}"
+                            aria-expanded="false"
+                            class="accordion-button collapsed"
+                            data-bs-target="#flush-collapseOne-${currentIndex + 1}"
+                            data-bs-toggle="collapse"
+                            type="button"
+                        >
                             Regra ${currentIndex + 1}
                         </button>
                     </h2>
