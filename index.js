@@ -98,7 +98,7 @@
     document.querySelector("#executa").onclick = e => {
         const perguntas = document.querySelectorAll(".carousel-item")
         const responderLista = document.querySelectorAll(".responder")
-        let i = 0;
+
         for (let i = 0; i<responderLista.length;i++) {
             responderLista[i].onclick = e => {
                 for (const perguntaParaRemoverStatus of perguntas) {
