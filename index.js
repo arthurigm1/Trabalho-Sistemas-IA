@@ -113,8 +113,8 @@
         const perguntas = document.querySelectorAll(".carousel-item")
         avancarBTN.onclick = e => {
             const indexExecucao = Number(localStorage.getItem("indexExecucao"))
-            //Object.values($0.selectedOptions).map(({value})=>value)
-            const respostaAtual = document.getElementById("respostas-" + indexExecucao).value
+            const selectDaResposta = document.getElementById("respostas-" + indexExecucao)
+            const respostaAtual = selectDaResposta?.multiple ? Object.values(selectDaResposta.selectedOptions).map(({value}) => value) : [selectDaResposta.value]
             const execucaoVariavel = document.getElementById("execucaoVariavel-" + indexExecucao).value
             respostas = [...respostas, {variavel: execucaoVariavel, resposta: respostaAtual}]
             for (const perguntaParaRemoverStatus of perguntas) {
@@ -122,7 +122,35 @@
             }
             console.log({indexExecucao, length: perguntas.length, perguntas})
             if ((indexExecucao + 1) === perguntas.length) {
-                console.log("ultima pagina: resultado", {respostas})
+                console.log("ultima pagina: resultado", {respostas, regras})
+                let resultado = []
+                const variaveisRespondidas = respostas.map((respostaIt) => respostaIt.variavel)
+                const variaveisParaVerificacao = variaveis.filter(function (it) {
+                    return variaveisRespondidas.includes(it.name)
+                })
+                console.log({variaveisRespondidas, variaveisParaVerificacao, variaveis})
+                for (const {se, entao} of regras) {
+                    const condicaoVerificada = se.every((seIt) => {
+                        const {resposta} = respostas.find((buscaPorRespostaIt) => buscaPorRespostaIt.variavel === seIt.variavel)
+                        /*const variavelDaResposta = variaveisParaVerificacao.find(variaveisRespondidasIt => variaveisRespondidasIt.name === seIt.variavel)*/
+                        console.log({
+                            seIt,
+                            resposta,
+                            valor:seIt.valor,
+                            resultado: seIt.operador === '=' ? resposta.includes(seIt.valor) : !resposta.includes(seIt.valor),
+                            operadorIgual: seIt.operador === '=',
+                            valorDoSeEstaNaResposta: resposta.includes(seIt.valor)
+                        })
+
+                        return seIt.operador === '=' ? resposta.includes(seIt.valor) : !resposta.includes(seIt.valor)
+                    })
+                    console.log({condicaoVerificada, se, entao})
+                    if (condicaoVerificada === true) {
+                        resultado = [...resultado, {se, entao}]
+                    }
+                }
+                console.log({resultado})
+
             } else {
                 perguntas[indexExecucao + 1].classList.add("active")
                 localStorage.setItem("indexExecucao", String(indexExecucao + 1))
