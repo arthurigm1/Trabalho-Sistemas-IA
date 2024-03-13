@@ -99,12 +99,17 @@
         const perguntas = document.querySelectorAll(".carousel-item")
         const responderLista = document.querySelectorAll(".responder")
 
-        for (let i = 0; i<responderLista.length;i++) {
+        for (let i = 0; i < responderLista.length; i++) {
             responderLista[i].onclick = e => {
                 for (const perguntaParaRemoverStatus of perguntas) {
                     perguntaParaRemoverStatus.classList.remove("active")
                 }
-                perguntas[i + 1].classList.add("active")
+                if ((i + 1) === responderLista.length) {
+                    console.log("ultima pagina: resultado")
+                } else {
+                    perguntas[i + 1].classList.add("active")
+                }
+                e.preventDefault()
             }
         }
     }
