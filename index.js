@@ -1,6 +1,7 @@
 (() => {
     let regras = JSON.parse(localStorage.getItem('regras')) || [];
     let variaveis = JSON.parse(localStorage.getItem('variaveis')) || [];
+    let respostas = [];
 
     function atualizaCache() {
         localStorage.setItem("variaveis", JSON.stringify(variaveis))
@@ -96,22 +97,38 @@
         });
 
     document.querySelector("#executa").onclick = e => {
+        localStorage.setItem("indexExecucao", "0")
+        respostas = [];
+        const variaveisUtilizadasNaExecucao = variaveis.filter((itVar) => {
+            if (itVar?.objetivo) {
+                return false
+            }
+            return regras.some(({
+                                    se, entao
+                                }) => (se.some((itSe) => itSe.variavel === itVar.name) || entao.some((itEntao) => itEntao.variavel === itVar.name)))
+        })
+        const listaDeExecucao = document.getElementById("listaDeExecucao")
+        listaDeExecucao.innerHTML = geraListaDeExecucao(variaveisUtilizadasNaExecucao)
+        const avancarBTN = document.getElementById("avancar")
         const perguntas = document.querySelectorAll(".carousel-item")
-        const responderLista = document.querySelectorAll(".responder")
-
-        for (let i = 0; i < responderLista.length; i++) {
-            responderLista[i].onclick = e => {
-                for (const perguntaParaRemoverStatus of perguntas) {
-                    perguntaParaRemoverStatus.classList.remove("active")
-                }
-                if ((i + 1) === responderLista.length) {
-                    console.log("ultima pagina: resultado")
-                } else {
-                    perguntas[i + 1].classList.add("active")
-                }
-                e.preventDefault()
+        avancarBTN.onclick = e => {
+            const indexExecucao = Number(localStorage.getItem("indexExecucao"))
+            //Object.values($0.selectedOptions).map(({value})=>value)
+            const respostaAtual = document.getElementById("respostas-" + indexExecucao).value
+            const execucaoVariavel = document.getElementById("execucaoVariavel-" + indexExecucao).value
+            respostas = [...respostas, {variavel: execucaoVariavel, resposta: respostaAtual}]
+            for (const perguntaParaRemoverStatus of perguntas) {
+                perguntaParaRemoverStatus.classList.remove("active")
+            }
+            console.log({indexExecucao, length: perguntas.length, perguntas})
+            if ((indexExecucao + 1) === perguntas.length) {
+                console.log("ultima pagina: resultado", {respostas})
+            } else {
+                perguntas[indexExecucao + 1].classList.add("active")
+                localStorage.setItem("indexExecucao", String(indexExecucao + 1))
             }
         }
+
     }
 
     function preencheVariaveis() {
@@ -263,29 +280,32 @@
         const list = document.getElementById('perguntalist');
         list.innerHTML = '';
         for (const item of variaveis) {
-            const li = document.createElement('li');
-            li.innerHTML = item?.name;
-            li.addEventListener('click', () => {
-                document.querySelector('#index2').value = item?.name;
-                if (item?.pergunta) {
-                    document.querySelector('#exibirperg').textContent = item?.pergunta;
-                    const icon = deleteIcon()
-                    icon.classList.add('ms-2')
-                    icon.addEventListener('click', e => {
-                        variaveis = variaveis.map((variavel) => {
-                            if (variavel.name === item?.name) {
-                                return {...variavel, pergunta: ""}
-                            }
-                            return variavel
+            if (!item?.objetivo) {
+                const li = document.createElement('li');
+                li.innerHTML = item?.name;
+                li.addEventListener('click', () => {
+                    document.querySelector('#index2').value = item?.name;
+                    if (item?.pergunta) {
+                        document.querySelector('#exibirperg').textContent = item?.pergunta;
+                        const icon = deleteIcon()
+                        icon.classList.add('ms-2')
+                        icon.addEventListener('click', e => {
+                            variaveis = variaveis.map((variavel) => {
+                                if (variavel.name === item?.name) {
+                                    return {...variavel, pergunta: ""}
+                                }
+                                return variavel
+                            })
+                            atualizaCache()
+                            document.querySelector('#exibirperg').innerHTML = ""
+                            e.preventDefault()
                         })
-                        atualizaCache()
-                        document.querySelector('#exibirperg').innerHTML = ""
-                        e.preventDefault()
-                    })
-                    document.querySelector('#exibirperg').appendChild(icon)
-                }
-            });
-            list.appendChild(li);
+                        document.querySelector('#exibirperg').appendChild(icon)
+                    }
+                });
+                list.appendChild(li);
+            }
+
         }
 
     }
@@ -483,6 +503,34 @@
 
     }
 
-})();
+    function geraSelectDeResposta(valores = [], tipo, index) {
+        const options = String(tipo) === '1' ? valores.reduce((previousValue, currentValue, currentIndex, array) => (previousValue.concat(`
+                   <option value="${currentValue}">${currentValue}</option>
+            `)), '') : `
+           <option value="1">sim</option>
+           <option value="2">nao</option>
+        `
+        return `
+                <select id="respostas-${index}" name="respostas" class="form-select" ${String(tipo) === '1' ? 'multiple' : ''}>
+                   ${options}
+                </select>
+        `
+    }
 
+    function geraListaDeExecucao(variaveisDeExecucao = []) {
+        if (!Array.isArray(variaveisDeExecucao) || (Array.isArray(variaveisDeExecucao) && !variaveisDeExecucao.length)) {
+            return ""
+        }
+        return variaveisDeExecucao.reduce(function (previousValue, {pergunta, name, valores, tipo}, currentIndex) {
+            return previousValue.concat(`
+            <div class="carousel-item ${currentIndex === 0 ? 'active' : ''}">
+                <h2 class="h3 mb-4 text-capitalize">${pergunta.replaceAll("?", " ")}?</h2>
+                <input type="hidden" name="execucaoVariavel-${currentIndex}" id="execucaoVariavel-${currentIndex}" value="${name}" >
+                ${geraSelectDeResposta(valores, tipo, currentIndex)}
+            </div>
+            `)
+        }, '')
+    }
+
+})();
 
