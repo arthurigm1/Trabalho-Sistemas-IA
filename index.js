@@ -29,7 +29,12 @@
             atualizaCache()
 
         } else if (target === '') {
-            alert('Selecione uma variavel');
+            Swal.fire({
+                icon: "error",
+                title: "ERRO...",
+                text: "Selecione uma variavel"
+
+            });
         }
 
         preenchePergunta();
@@ -38,6 +43,7 @@
     };
     for (const item of document.querySelectorAll('.list li')) {
         item.addEventListener('click', (evente) => {
+
             for (const section of document.querySelectorAll('.main section')) {
                 section.style.display = 'none';
             }
@@ -50,8 +56,17 @@
 
                 preenchePergunta();
 
-                document.getElementById('buttopergunta')
-                    .addEventListener('click', adicionaperg);
+                var helpLink = document.getElementById('helpLink');
+
+                // Adiciona um evento de clique ao link
+                helpLink.addEventListener('click', function (event) {
+                    // Impede o comportamento padrão do link (neste caso, evitar a navegação)
+                    event.preventDefault();
+
+                    // Exibe o SweetAlert2 quando o link for clicado
+                    Swal.fire("Para visualizar ou fazer a Pergunta basta selecionar clicando na variavel desejada.");
+                });
+                document.getElementById('buttopergunta').addEventListener('click', adicionaperg);
 
             }
             if (evente.target.textContent === 'Regras') {
@@ -75,161 +90,188 @@
 
         });
     }
+    document.getElementById("buttonajuda1").addEventListener("click", () => {
+        Swal.fire("Preencha digitando a variavel, selecione o tipo e se é objetivo ou nao, depois clique na variavel e digite um valor");
+    })
+    document.getElementById("buttonajuda2").addEventListener("click", () => {
+        Swal.fire("Sempre Crie uma Regra de inicio e depois adicione as condicoes e o entao.É possivel colocar mais de uma condicao em uma regra, porem nao e possivel colocar a mesma condicao de entao em duas regras diferentes!");
+    })
+    document.getElementById('buttonsalvar').addEventListener('click', () => {
+        const data = new FormData(formvar);
+        if (data.get('formname') === '') {
+            Swal.fire({
+                icon: "error",
+                title: "ERRO...",
+                text: "Preencha um valor"
 
-    document.getElementById('buttonsalvar')
-        .addEventListener('click', () => {
-            const data = new FormData(formvar);
-            if (data.get('formname') === '') {
-                alert('Preencha um valor');
-            } else {
-                variaveis.push({
-                    name: data.get('formname'),
-                    tipo: data.get('Tipo'),
-                    valores: [],
-                    resultado: "",
-                    pergunta: '',
-                    objetivo: document.getElementById("objetivo").checked
-                });
-                atualizaCache()
-                formvar.reset();
+            });
+        } else {
+            variaveis.push({
+                name: data.get('formname'),
+                tipo: data.get('Tipo'),
+                valores: [],
+                resultado: "",
+                pergunta: '',
+                objetivo: document.getElementById("objetivo").checked
+            });
+            atualizaCache()
+            formvar.reset();
 
-                preencheVariaveis();
-            }
-        });
+            preencheVariaveis();
+        }
+    });
 
 
     document.querySelector("#executa").onclick = () => {
-        const avancarBTN = document.getElementById("avancar")
-        avancarBTN.style.display = "block"
-        localStorage.setItem("indexExecucao", "0")
-        respostas = [];
-        const variaveisUtilizadasNaExecucao = variaveis.filter((itVar) => {
-            if (itVar?.objetivo) {
-                return false
-            }
-            return regras.some(({
-                                    se, entao
-                                }) => (se.some((itSe) => itSe.variavel === itVar.name) || entao.some((itEntao) => itEntao.variavel === itVar.name)))
-        })
-        const listaDeExecucao = document.getElementById("listaDeExecucao")
-        listaDeExecucao.innerHTML = geraListaDeExecucao(variaveisUtilizadasNaExecucao)
+        if (regras == "") {
+            Swal.fire("Atencao! Programa incompleto! Revise suas informacoes!");
+        }
+        else {
+            const avancarBTN = document.getElementById("avancar")
+            avancarBTN.style.display = "block"
+            localStorage.setItem("indexExecucao", "0")
+            respostas = [];
+            const variaveisUtilizadasNaExecucao = variaveis.filter((itVar) => {
+                if (itVar?.objetivo) {
+                    return false
+                }
+                return regras.some(({
+                    se, entao
+                }) => (se.some((itSe) => itSe.variavel === itVar.name) || entao.some((itEntao) => itEntao.variavel === itVar.name)))
+            })
+            const listaDeExecucao = document.getElementById("listaDeExecucao")
+            listaDeExecucao.innerHTML = geraListaDeExecucao(variaveisUtilizadasNaExecucao)
 
-        const perguntas = document.querySelectorAll(".carousel-item")
-        avancarBTN.onclick = () => {
+            const perguntas = document.querySelectorAll(".carousel-item")
+            avancarBTN.onclick = () => {
 
-            const indexExecucao = Number(localStorage.getItem("indexExecucao"))
-            const selectDaResposta = document.getElementById("respostas-" + indexExecucao)
-            const respostaAtual = selectDaResposta?.multiple ? Object.values(selectDaResposta.selectedOptions)?.map(({value}) => value) : [selectDaResposta.value]
-            const execucaoVariavel = document.getElementById("execucaoVariavel-" + indexExecucao)?.value
-            respostas = [...respostas, {variavel: execucaoVariavel, resposta: respostaAtual}]
-            for (const perguntaParaRemoverStatus of perguntas) {
-                perguntaParaRemoverStatus.classList.remove("active")
-            }
-            if ((indexExecucao + 1) === perguntas.length) {
-                let resultado = []
-                let posicaoDaRegra = 1
-                for (const {se, entao} of regras) {
-                    const variaveisObjetivo = variaveis.filter(({objetivo = false}) => objetivo)
-                    const condicoesDeVariaveisObjetivo = se.filter(itSe => variaveisObjetivo.map(({name}) => name)?.includes(itSe.variavel))
-                    let condicaoDeObjetivoFalhou = false
+                const indexExecucao = Number(localStorage.getItem("indexExecucao"))
+                const selectDaResposta = document.getElementById("respostas-" + indexExecucao)
+                const respostaAtual = selectDaResposta?.multiple ? Object.values(selectDaResposta.selectedOptions)?.map(({ value }) => value) : [selectDaResposta.value]
+                const execucaoVariavel = document.getElementById("execucaoVariavel-" + indexExecucao)?.value
+                respostas = [...respostas, { variavel: execucaoVariavel, resposta: respostaAtual }]
+                for (const perguntaParaRemoverStatus of perguntas) {
+                    perguntaParaRemoverStatus.classList.remove("active")
+                }
+                if ((indexExecucao + 1) === perguntas.length) {
+                    let resultado = []
+                    let posicaoDaRegra = 1
+                    for (const { se, entao } of regras) {
+                        const variaveisObjetivo = variaveis.filter(({ objetivo = false }) => objetivo)
+                        const condicoesDeVariaveisObjetivo = se.filter(itSe => variaveisObjetivo.map(({ name }) => name)?.includes(itSe.variavel))
+                        let condicaoDeObjetivoFalhou = false
 
-                    for (const {valor, variavel} of condicoesDeVariaveisObjetivo) {
-                        const variavelObjetivoParaVerificacao = variaveisObjetivo?.find(({name}) => name === variavel)
-                        if (valor !== variavelObjetivoParaVerificacao?.resultado) {
-                            condicaoDeObjetivoFalhou = true
-                            break;
+                        for (const { valor, variavel } of condicoesDeVariaveisObjetivo) {
+                            const variavelObjetivoParaVerificacao = variaveisObjetivo?.find(({ name }) => name === variavel)
+                            if (valor !== variavelObjetivoParaVerificacao?.resultado) {
+                                condicaoDeObjetivoFalhou = true
+                                break;
+                            }
                         }
-                    }
 
-                    const condicoesDeVariaveisNaoObjetivo = se.filter(itSe => !variaveisObjetivo.map(({name}) => name)?.includes(itSe.variavel))
-                    const condicaoNaoObjetivoVerificada = condicoesDeVariaveisNaoObjetivo.every((seIt) => {
-                        const {resposta = []} = respostas.find((buscaPorRespostaIt) => buscaPorRespostaIt.variavel === seIt.variavel)
-                        return seIt.operador === '=' ? resposta.includes(seIt.valor) : !resposta.includes(seIt.valor)
-                    })
-                    if (condicaoNaoObjetivoVerificada && !condicaoDeObjetivoFalhou) {
-                        for (const conclusao of entao) {
-                            variaveis = variaveis.map(itVarConclusao => {
-                                if (itVarConclusao.name === conclusao.variavel) {
-                                    return {
-                                        ...itVarConclusao, resultado: conclusao.valor
+                        const condicoesDeVariaveisNaoObjetivo = se.filter(itSe => !variaveisObjetivo.map(({ name }) => name)?.includes(itSe.variavel))
+                        const condicaoNaoObjetivoVerificada = condicoesDeVariaveisNaoObjetivo.every((seIt) => {
+                            const { resposta = [] } = respostas.find((buscaPorRespostaIt) => buscaPorRespostaIt.variavel === seIt.variavel)
+                            return seIt.operador === '=' ? resposta.includes(seIt.valor) : !resposta.includes(seIt.valor)
+                        })
+                        if (condicaoNaoObjetivoVerificada && !condicaoDeObjetivoFalhou) {
+                            for (const conclusao of entao) {
+                                variaveis = variaveis.map(itVarConclusao => {
+                                    if (itVarConclusao.name === conclusao.variavel) {
+                                        return {
+                                            ...itVarConclusao, resultado: conclusao.valor
+                                        }
                                     }
-                                }
-                                return itVarConclusao
-                            })
+                                    return itVarConclusao
+                                })
+                            }
+                            resultado = [...resultado, { label: `Regra ${posicaoDaRegra}`, se, entao }]
+
+                            atualizaCache()
                         }
-                        resultado = [...resultado, {label: `Regra ${posicaoDaRegra}`, se, entao}]
-
-                        atualizaCache()
+                        posicaoDaRegra++;
                     }
-                    posicaoDaRegra++;
-                }
+                    console.log({ respostas, resultado, regras, variaveis })
+                    function exibirPassosDeExecucao(resultado) {
+                        const listaDeExecucao = document.getElementById("listaDeExecucao");
+                        listaDeExecucao.innerHTML = "";
 
-                function exibirPassosDeExecucao(resultado) {
-                    const listaDeExecucao = document.getElementById("listaDeExecucao");
-                    listaDeExecucao.innerHTML = "";
+                        if (resultado.length === 0) {
+                            listaDeExecucao.innerHTML = '<p class="text-muted">Sem conclusão</p>';
+                        } else {
+                            const divResultado = document.createElement("div");
+                            divResultado.classList.add("card");
+                            const cardHeader = document.createElement("div");
+                            cardHeader.classList.add("card-header");
+                            const cardTitle = document.createElement("h5");
+                            cardTitle.classList.add("card-title");
+                            cardTitle.textContent = "Passos de Execução";
+                            cardHeader.appendChild(cardTitle);
+                            divResultado.appendChild(cardHeader);
 
-                    if (resultado.length === 0) {
-                        listaDeExecucao.innerHTML = '<p class="text-muted">Sem conclusão</p>';
-                    } else {
-                        const divResultado = document.createElement("div");
-                        divResultado.classList.add("card");
-                        const cardHeader = document.createElement("div");
-                        cardHeader.classList.add("card-header");
-                        const cardTitle = document.createElement("h5");
-                        cardTitle.classList.add("card-title");
-                        cardTitle.textContent = "Passos de Execução";
-                        cardHeader.appendChild(cardTitle);
-                        divResultado.appendChild(cardHeader);
+                            const cardBody = document.createElement("div");
+                            cardBody.classList.add("card-body");
+                            function teste1(valor) {
+                                if (valor == 1) {
+                                    return "Sim"
+                                }
+                                else if (valor == 2) {
+                                    return "nao"
+                                }
+                                else {
+                                    return valor
+                                }
 
-                        const cardBody = document.createElement("div");
-                        cardBody.classList.add("card-body");
+                            }
+                            resultado.forEach((passo, index) => {
+                                const secaoPasso = document.createElement("div");
+                                secaoPasso.classList.add("mb-3");
+                                const tituloPasso = document.createElement("h6");
+                                tituloPasso.classList.add("card-subtitle", "mb-2");
+                                tituloPasso.textContent = `Passo ${index + 1}: ${passo.label}`;
+                                secaoPasso.appendChild(tituloPasso);
+                                const condicoesRegra = document.createElement("p");
+                                condicoesRegra.classList.add("card-text", "mb-1", "fw-bold");
+                                condicoesRegra.textContent = "Condições da regra:";
+                                secaoPasso.appendChild(condicoesRegra);
+                                const listaCondicoesSe = document.createElement("ul");
+                                listaCondicoesSe.classList.add("list-group", "list-group-flush", "mb-2");
+                                passo.se.forEach((condicao) => {
+                                    const variavelDaCondicao = variaveis.find(it => it.name === condicao.variavel)
 
-                        resultado.forEach((passo, index) => {
-                            const secaoPasso = document.createElement("div");
-                            secaoPasso.classList.add("mb-3");
-                            const tituloPasso = document.createElement("h6");
-                            tituloPasso.classList.add("card-subtitle", "mb-2");
-                            tituloPasso.textContent = `Passo ${index + 1}: ${passo.label}`;
-                            secaoPasso.appendChild(tituloPasso);
-                            const condicoesRegra = document.createElement("p");
-                            condicoesRegra.classList.add("card-text", "mb-1", "fw-bold");
-                            condicoesRegra.textContent = "Condições da regra:";
-                            secaoPasso.appendChild(condicoesRegra);
-                            const listaCondicoesSe = document.createElement("ul");
-                            listaCondicoesSe.classList.add("list-group", "list-group-flush", "mb-2");
-                            passo.se.forEach((condicao) => {
-                                const itemCondicao = document.createElement("li");
-                                itemCondicao.classList.add("list-group-item");
-                                itemCondicao.textContent = `Se ${condicao.variavel} ${condicao.operador} ${condicao.valor}`;
-                                listaCondicoesSe.appendChild(itemCondicao);
+                                    const itemCondicao = document.createElement("li");
+                                    itemCondicao.classList.add("list-group-item");
+                                    console.log(condicao.valor)
+                                    itemCondicao.textContent = `Se, ${variavelDaCondicao.objetivo ? variavelDaCondicao.name : variavelDaCondicao.pergunta.replaceAll("?", "").concat(" ?")} ${condicao.operador === '=' ? "igual a" : "diferente de"}, ${formataResposta(condicao.valor)}`;
+                                    listaCondicoesSe.appendChild(itemCondicao);
+                                });
+                                secaoPasso.appendChild(listaCondicoesSe);
+                                const listaCondicoesEntao = document.createElement("ul");
+                                listaCondicoesEntao.classList.add("list-group", "list-group-flush");
+                                passo.entao.forEach((condicao) => {
+                                    const itemCondicao = document.createElement("li");
+                                    itemCondicao.classList.add("list-group-item");
+                                    itemCondicao.textContent = `Então ${condicao.variavel} igual a ${formataResposta(condicao.valor)}`;
+                                    listaCondicoesEntao.appendChild(itemCondicao);
+                                });
+                                secaoPasso.appendChild(listaCondicoesEntao);
+                                cardBody.appendChild(secaoPasso);
                             });
-                            secaoPasso.appendChild(listaCondicoesSe);
-                            const listaCondicoesEntao = document.createElement("ul");
-                            listaCondicoesEntao.classList.add("list-group", "list-group-flush");
-                            passo.entao.forEach((condicao) => {
-                                const itemCondicao = document.createElement("li");
-                                itemCondicao.classList.add("list-group-item");
-                                itemCondicao.textContent = `Então ${condicao.variavel} = ${condicao.valor}`;
-                                listaCondicoesEntao.appendChild(itemCondicao);
-                            });
-                            secaoPasso.appendChild(listaCondicoesEntao);
-                            cardBody.appendChild(secaoPasso);
-                        });
 
-                        divResultado.appendChild(cardBody);
-                        listaDeExecucao.appendChild(divResultado);
+                            divResultado.appendChild(cardBody);
+                            listaDeExecucao.appendChild(divResultado);
 
+                        }
+                        avancarBTN.style.display = "none"
                     }
-                    avancarBTN.style.display = "none"
-                }
 
-                exibirPassosDeExecucao(resultado)
-            } else {
-                perguntas[indexExecucao + 1].classList.add("active")
-                localStorage.setItem("indexExecucao", String(indexExecucao + 1))
+                    exibirPassosDeExecucao(resultado)
+                } else {
+                    perguntas[indexExecucao + 1].classList.add("active")
+                    localStorage.setItem("indexExecucao", String(indexExecucao + 1))
+                }
             }
         }
-
     }
 
     function preencheVariaveis() {
@@ -251,15 +293,48 @@
             const icon = deleteIcon()
             icon.classList.add('ms-2')
             icon.onclick = e => {
-                variaveis = variaveis.filter(({name}) => name !== variavel?.name)
-                regras = regras.filter(({se, entao}) => {
-                    const seCheck = se.some(({variavel: variavelSe}) => variavelSe === variavel?.name)
-                    const entaoCheck = entao.some(({variavel: variavelEntao}) => variavelEntao === variavel?.name)
-                    return !(seCheck || entaoCheck);
-                })
-                atualizaCache()
-                preencheVariaveis()
-                e.preventDefault()
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+                swalWithBootstrapButtons.fire({
+                    title: "Voce tem certeza?",
+                    text: "Voce nao podera inverter essa acao!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sim, deletar!",
+                    cancelButtonText: "Nao, cancelar!",
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Deletado!",
+                            text: "Sua Variavel foi deletada.",
+                            icon: "success"
+                        });
+                        variaveis = variaveis.filter(({ name }) => name !== variavel?.name)
+                        regras = regras.filter(({ se, entao }) => {
+                            const seCheck = se.some(({ variavel: variavelSe }) => variavelSe === variavel?.name)
+                            const entaoCheck = entao.some(({ variavel: variavelEntao }) => variavelEntao === variavel?.name)
+                            return !(seCheck || entaoCheck);
+                        })
+                        atualizaCache()
+                        preencheVariaveis()
+                        e.preventDefault()
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Cancelado!",
+                            icon: "error"
+                        });
+                    }
+                });
+
             }
             item.appendChild(icon)
             item.appendChild(itemBTN)
@@ -274,7 +349,12 @@
             const target = document.querySelector('#index')?.value;
 
             if (data.get('formvalor') === '') {
-                alert('Preencha um valor');
+                Swal.fire({
+                    icon: "error",
+                    title: "ERRO...",
+                    text: "Preencha um valor"
+
+                });
             } else {
                 variaveis = variaveis.map((item) => {
                     if (target === item?.name) {
@@ -322,22 +402,57 @@
                 const icon = deleteIcon()
                 icon.classList.add('ms-2')
                 icon.onclick = e => {
-                    variaveis = variaveis.map((it) => {
-                        if (it?.name === target) {
-                            return {
-                                ...it, valores: it.valores.filter((value) => value !== item)
-                            }
+
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: "btn btn-success",
+                            cancelButton: "btn btn-danger"
+                        },
+                        buttonsStyling: false
+                    });
+                    swalWithBootstrapButtons.fire({
+                        title: "Voce tem certeza?",
+                        text: "Voce nao podera inverter essa acao!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Sim, deletar!",
+                        cancelButtonText: "Nao, cancelar!",
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            swalWithBootstrapButtons.fire({
+                                title: "Deletado!",
+                                text: "Seu Valor foi deletado.",
+                                icon: "success"
+                            });
+                            variaveis = variaveis.map((it) => {
+                                if (it?.name === target) {
+                                    return {
+                                        ...it, valores: it.valores.filter((value) => value !== item)
+                                    }
+                                }
+                                return it;
+                            })
+                            regras = regras.filter(({ se, entao }) => {
+                                const seCheck = se.some(({ valor: valorSe }) => valorSe === item)
+                                const entaoCheck = entao.some(({ valor: valorEntao }) => valorEntao === item)
+                                return !(seCheck || entaoCheck);
+                            })
+                            atualizaCache()
+                            preencherValores()
+                            e.preventDefault()
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire({
+                                title: "Cancelado!",
+                                icon: "error"
+                            });
                         }
-                        return it;
-                    })
-                    regras = regras.filter(({se, entao}) => {
-                        const seCheck = se.some(({valor: valorSe}) => valorSe === item)
-                        const entaoCheck = entao.some(({valor: valorEntao}) => valorEntao === item)
-                        return !(seCheck || entaoCheck);
-                    })
-                    atualizaCache()
-                    preencherValores()
-                    e.preventDefault()
+                    });
+
+
                 }
                 li.appendChild(icon)
                 list.appendChild(li);
@@ -351,7 +466,7 @@
         const target = e.target.value;
         const {
             valores = [], tipo = '', objetivo = false
-        } = variaveis.find(({name}) => (name === target)) || {};
+        } = variaveis.find(({ name }) => (name === target)) || {};
         const regravalor = document.getElementById(targetNode);
         regravalor.innerHTML = `<option value selected>Desconhecido</option>`;
         if (tipo === '1' || objetivo) {
@@ -391,17 +506,60 @@
                         const icon = deleteIcon()
                         icon.classList.add('ms-2')
                         icon.addEventListener('click', e => {
-                            variaveis = variaveis.map((variavel) => {
-                                if (variavel.name === item?.name) {
-                                    return {...variavel, pergunta: ""}
+                            const swalWithBootstrapButtons = Swal.mixin({
+                                customClass: {
+                                    confirmButton: "btn btn-success",
+                                    cancelButton: "btn btn-danger"
+                                },
+                                buttonsStyling: false
+                            });
+                            swalWithBootstrapButtons.fire({
+                                title: "Voce tem certeza?",
+                                text: "Voce nao podera inverter essa acao!",
+                                icon: "warning",
+                                showCancelButton: true,
+                                confirmButtonText: "Sim, deletar!",
+                                cancelButtonText: "Nao, cancelar!",
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    swalWithBootstrapButtons.fire({
+                                        title: "Deletado!",
+                                        text: "Sua Pergunta foi deletada.",
+                                        icon: "success"
+                                    });
+                                    variaveis = variaveis.map((variavel) => {
+                                        if (variavel.name === item?.name) {
+                                            return { ...variavel, pergunta: "" }
+                                        }
+                                        return variavel
+                                    })
+                                    atualizaCache()
+                                    document.querySelector('#exibirperg').innerHTML = ""
+                                    preenchePergunta()
+                                    e.preventDefault()
+                                } else if (
+                                    /* Read more about handling dismissals below */
+                                    result.dismiss === Swal.DismissReason.cancel
+                                ) {
+                                    swalWithBootstrapButtons.fire({
+                                        title: "Cancelado!",
+                                        icon: "error"
+                                    });
                                 }
-                                return variavel
-                            })
-                            atualizaCache()
-                            document.querySelector('#exibirperg').innerHTML = ""
-                            e.preventDefault()
+                            });
+
+
                         })
+
+
+
+
+
                         document.querySelector('#exibirperg')?.appendChild(icon)
+                    }
+                    else {
+                        document.querySelector('#exibirperg').textContent = "";
                     }
                 });
                 list.appendChild(li);
@@ -445,6 +603,7 @@
         const listaDeRegrasCollapsed = document.querySelectorAll(".collapsed")
         for (let i = 0; i < listaDeRegrasCollapsed.length; i++) {
             listaDeRegrasCollapsed[i].onclick = e => {
+
                 document.querySelector("#regraselecionada").value = i;
                 document.querySelector("#condicaoForm").reset()
                 e.preventDefault()
@@ -453,18 +612,52 @@
         const regrasBTN = document.querySelectorAll(".regra")
         for (let i = 0; i < regrasBTN.length; i++) {
             regrasBTN[i].onclick = e => {
-                regras = regras.filter((value, index,) => index !== i)
-                atualizaCache()
-                preencheCondicoesEEntao();
-                preencheListaDeRegras()
-                e.preventDefault()
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: "btn btn-success",
+                        cancelButton: "btn btn-danger"
+                    },
+                    buttonsStyling: false
+                });
+                swalWithBootstrapButtons.fire({
+                    title: "Voce tem certeza?",
+                    text: "Voce nao podera inverter essa acao!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sim, deletar!",
+                    cancelButtonText: "Nao, cancelar!",
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Deletado!",
+                            text: "Sua regra foi deletada.",
+                            icon: "success"
+
+                        });
+                        regras = regras.filter((value, index,) => index !== i)
+                        atualizaCache()
+                        preencheCondicoesEEntao();
+                        preencheListaDeRegras()
+                        e.preventDefault()
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Cancelado",
+                            icon: "error"
+                        });
+                    }
+                });
+
             }
         }
 
     }
 
     function adicionarRegra(e) {
-        regras = [...regras, {se: [], entao: []}]
+        regras = [...regras, { se: [], entao: [] }]
         atualizaCache()
         preencheListaDeRegras()
         e.preventDefault()
@@ -473,6 +666,7 @@
     function adicionarCondicao(e) {
         const condicaoForm = document.getElementById('condicaoForm');
         const data = new FormData(condicaoForm);
+
         regras = regras.map((value, index) => {
             if ((index) === regraSelecionada()) {
                 return {
@@ -491,6 +685,7 @@
         preencheListaDeRegras()
         e.preventDefault()
         return false
+
     }
 
     function regraSelecionada() {
@@ -529,21 +724,34 @@
             if (!Array.isArray(linhas) || (Array.isArray(linhas) && !linhas.length)) {
                 return ""
             }
-            return linhas.reduce(function cb(previousValue, {variavel, operador, valor}, currentIndex) {
+            return linhas.reduce(function cb(previousValue, { variavel, operador, valor }, currentIndex) {
                 return previousValue.concat(`<tr>
                            <th scope="row">${currentIndex + 1}</th>
                             <td>${variavel}</td>
                             <td>${operador}</td>
-                            <td>${valor}</td>
+                            <td>${teste(valor)}</td>
                          </tr>`)
             }, '')
+
+        }
+        function teste(valor) {
+            if (valor == 1) {
+                return "Sim"
+            }
+            else if (valor == 2) {
+                return "nao"
+            }
+            else {
+                return valor
+            }
+
         }
 
         function geraLinhaDaTabelaENTAO(linhas = []) {
             if (!Array.isArray(linhas) || (Array.isArray(linhas) && !linhas.length)) {
                 return ""
             }
-            return linhas.reduce(function cb(previousValue, {variavel, valor}, currentIndex) {
+            return linhas.reduce(function cb(previousValue, { variavel, valor }, currentIndex) {
                 return previousValue.concat(`<tr>
                             <th scope="row">${currentIndex + 1}</th>
                             <td>${variavel}</td>
@@ -552,7 +760,7 @@
             }, '')
         }
 
-        return regras.reduce(function (previousValue, {se, entao}, currentIndex) {
+        return regras.reduce(function (previousValue, { se, entao }, currentIndex) {
             return previousValue.concat(`<div class="accordion-item">
                     <h2 class="accordion-header d-flex align-items-center ">
                      <i class="fa-solid fa-trash regra me-2 text-danger" role="button"></i> 
@@ -622,7 +830,7 @@
         if (!Array.isArray(variaveisDeExecucao) || (Array.isArray(variaveisDeExecucao) && !variaveisDeExecucao.length)) {
             return ""
         }
-        return variaveisDeExecucao.reduce(function (previousValue, {pergunta, name, valores, tipo}, currentIndex) {
+        return variaveisDeExecucao.reduce(function (previousValue, { pergunta, name, valores, tipo }, currentIndex) {
             return previousValue.concat(`
             <div class="carousel-item ${currentIndex === 0 ? 'active' : ''}">
                 <h2 class="h3 mb-4 text-capitalize">${pergunta.replaceAll("?", " ")}?</h2>
@@ -632,6 +840,15 @@
             `)
         }, '')
     }
+    const formataResposta = resp => {
+        if (resp === '1') {
+            return "sim"
+        }
+        if (resp === '2') {
+            return "nao"
+        }
+        return resp
 
+    }
 })();
 
