@@ -12,7 +12,7 @@
     const formvar = document.getElementById('formvar');
     const formperg = document.getElementById('perguntasform');
     const adicionaperg = (e) => {
-        const target = document.getElementById('index2').value;
+        const target = document.getElementById('index2')?.value;
         const data = new FormData(formperg);
         const pergunta = data.get('perguntaform');
 
@@ -86,6 +86,7 @@
                     name: data.get('formname'),
                     tipo: data.get('Tipo'),
                     valores: [],
+                    resultado: "",
                     pergunta: '',
                     objetivo: document.getElementById("objetivo").checked
                 });
@@ -96,7 +97,8 @@
             }
         });
 
-    document.querySelector("#executa").onclick = e => {
+
+    document.querySelector("#executa").onclick = () => {
         localStorage.setItem("indexExecucao", "0")
         respostas = [];
         const variaveisUtilizadasNaExecucao = variaveis.filter((itVar) => {
@@ -111,46 +113,114 @@
         listaDeExecucao.innerHTML = geraListaDeExecucao(variaveisUtilizadasNaExecucao)
         const avancarBTN = document.getElementById("avancar")
         const perguntas = document.querySelectorAll(".carousel-item")
-        avancarBTN.onclick = e => {
+        avancarBTN.onclick = () => {
             const indexExecucao = Number(localStorage.getItem("indexExecucao"))
             const selectDaResposta = document.getElementById("respostas-" + indexExecucao)
-            const respostaAtual = selectDaResposta?.multiple ? Object.values(selectDaResposta.selectedOptions).map(({value}) => value) : [selectDaResposta.value]
-            const execucaoVariavel = document.getElementById("execucaoVariavel-" + indexExecucao).value
+            const respostaAtual = selectDaResposta?.multiple ? Object.values(selectDaResposta.selectedOptions)?.map(({value}) => value) : [selectDaResposta.value]
+            const execucaoVariavel = document.getElementById("execucaoVariavel-" + indexExecucao)?.value
             respostas = [...respostas, {variavel: execucaoVariavel, resposta: respostaAtual}]
             for (const perguntaParaRemoverStatus of perguntas) {
                 perguntaParaRemoverStatus.classList.remove("active")
             }
-            console.log({indexExecucao, length: perguntas.length, perguntas})
             if ((indexExecucao + 1) === perguntas.length) {
-                console.log("ultima pagina: resultado", {respostas, regras})
                 let resultado = []
-                const variaveisRespondidas = respostas.map((respostaIt) => respostaIt.variavel)
-                const variaveisParaVerificacao = variaveis.filter(function (it) {
-                    return variaveisRespondidas.includes(it.name)
-                })
-                console.log({variaveisRespondidas, variaveisParaVerificacao, variaveis})
+                let posicaoDaRegra = 1
                 for (const {se, entao} of regras) {
-                    const condicaoVerificada = se.every((seIt) => {
-                        const {resposta} = respostas.find((buscaPorRespostaIt) => buscaPorRespostaIt.variavel === seIt.variavel)
-                        /*const variavelDaResposta = variaveisParaVerificacao.find(variaveisRespondidasIt => variaveisRespondidasIt.name === seIt.variavel)*/
-                        console.log({
-                            seIt,
-                            resposta,
-                            valor:seIt.valor,
-                            resultado: seIt.operador === '=' ? resposta.includes(seIt.valor) : !resposta.includes(seIt.valor),
-                            operadorIgual: seIt.operador === '=',
-                            valorDoSeEstaNaResposta: resposta.includes(seIt.valor)
-                        })
+                    const variaveisObjetivo = variaveis.filter(({objetivo = false}) => objetivo)
+                    const condicoesDeVariaveisObjetivo = se.filter(itSe => variaveisObjetivo.map(({name}) => name)?.includes(itSe.variavel))
+                    let condicaoDeObjetivoFalhou = false
 
+                    for (const {valor, variavel} of condicoesDeVariaveisObjetivo) {
+                        const variavelObjetivoParaVerificacao = variaveisObjetivo?.find(({name}) => name === variavel)
+                        if (valor !== variavelObjetivoParaVerificacao?.resultado) {
+                            condicaoDeObjetivoFalhou = true
+                            break;
+                        }
+                    }
+
+                    const condicoesDeVariaveisNaoObjetivo = se.filter(itSe => !variaveisObjetivo.map(({name}) => name)?.includes(itSe.variavel))
+                    const condicaoNaoObjetivoVerificada = condicoesDeVariaveisNaoObjetivo.every((seIt) => {
+                        const {resposta = []} = respostas.find((buscaPorRespostaIt) => buscaPorRespostaIt.variavel === seIt.variavel)
                         return seIt.operador === '=' ? resposta.includes(seIt.valor) : !resposta.includes(seIt.valor)
                     })
-                    console.log({condicaoVerificada, se, entao})
-                    if (condicaoVerificada === true) {
-                        resultado = [...resultado, {se, entao}]
-                    }
-                }
-                console.log({resultado})
+                    if (condicaoNaoObjetivoVerificada && !condicaoDeObjetivoFalhou) {
+                        for (const conclusao of entao) {
+                            variaveis = variaveis.map(itVarConclusao => {
+                                if (itVarConclusao.name === conclusao.variavel) {
+                                    return {
+                                        ...itVarConclusao, resultado: conclusao.valor
+                                    }
+                                }
+                                return itVarConclusao
+                            })
+                        }
+                        resultado = [...resultado, {label: `Regra ${posicaoDaRegra}`, se, entao}]
 
+                        atualizaCache()
+                    }
+                    posicaoDaRegra++;
+                }
+
+                function exibirPassosDeExecucao(resultado) {
+                    const listaDeExecucao = document.getElementById("listaDeExecucao");
+                    listaDeExecucao.innerHTML = "";
+
+                    if (resultado.length === 0) {
+                        listaDeExecucao.innerHTML = '<p class="text-muted">Sem conclusão</p>';
+                    } else {
+                        const divResultado = document.createElement("div");
+                        divResultado.classList.add("card");
+                        const cardHeader = document.createElement("div");
+                        cardHeader.classList.add("card-header");
+                        const cardTitle = document.createElement("h5");
+                        cardTitle.classList.add("card-title");
+                        cardTitle.textContent = "Passos de Execução";
+                        cardHeader.appendChild(cardTitle);
+                        divResultado.appendChild(cardHeader);
+
+                        const cardBody = document.createElement("div");
+                        cardBody.classList.add("card-body");
+
+                        resultado.forEach((passo, index) => {
+                            const secaoPasso = document.createElement("div");
+                            secaoPasso.classList.add("mb-3");
+                            const tituloPasso = document.createElement("h6");
+                            tituloPasso.classList.add("card-subtitle", "mb-2");
+                            tituloPasso.textContent = `Passo ${index + 1}: ${passo.label}`;
+                            secaoPasso.appendChild(tituloPasso);
+                            const condicoesRegra = document.createElement("p");
+                            condicoesRegra.classList.add("card-text", "mb-1", "fw-bold");
+                            condicoesRegra.textContent = "Condições da regra:";
+                            secaoPasso.appendChild(condicoesRegra);
+                            const listaCondicoesSe = document.createElement("ul");
+                            listaCondicoesSe.classList.add("list-group", "list-group-flush", "mb-2");
+                            passo.se.forEach((condicao) => {
+                                const itemCondicao = document.createElement("li");
+                                itemCondicao.classList.add("list-group-item");
+                                itemCondicao.textContent = `Se ${condicao.variavel} ${condicao.operador} ${condicao.valor}`;
+                                listaCondicoesSe.appendChild(itemCondicao);
+                            });
+                            secaoPasso.appendChild(listaCondicoesSe);
+                            const listaCondicoesEntao = document.createElement("ul");
+                            listaCondicoesEntao.classList.add("list-group", "list-group-flush");
+                            passo.entao.forEach((condicao) => {
+                                const itemCondicao = document.createElement("li");
+                                itemCondicao.classList.add("list-group-item");
+                                itemCondicao.textContent = `Então ${condicao.variavel} = ${condicao.valor}`;
+                                listaCondicoesEntao.appendChild(itemCondicao);
+                            });
+                            secaoPasso.appendChild(listaCondicoesEntao);
+                            cardBody.appendChild(secaoPasso);
+                        });
+
+                        divResultado.appendChild(cardBody);
+                        listaDeExecucao.appendChild(divResultado);
+
+                    }
+                    avancarBTN.style.display = "none"
+                }
+
+                exibirPassosDeExecucao(resultado)
             } else {
                 perguntas[indexExecucao + 1].classList.add("active")
                 localStorage.setItem("indexExecucao", String(indexExecucao + 1))
@@ -198,7 +268,7 @@
     document.getElementById('buttonvalor')
         .addEventListener('click', () => {
             const data = new FormData(valoresform);
-            const target = document.querySelector('#index').value;
+            const target = document.querySelector('#index')?.value;
 
             if (data.get('formvalor') === '') {
                 alert('Preencha um valor');
@@ -238,7 +308,7 @@
     }
 
     function preencherValores() {
-        const target = document.querySelector('#index').value;
+        const target = document.querySelector('#index')?.value;
         const find = variaveis.find((item) => item?.name === target);
         if (find) {
             const list = document.getElementById('valores');
@@ -249,7 +319,7 @@
                 const icon = deleteIcon()
                 icon.classList.add('ms-2')
                 icon.onclick = e => {
-                    variaveis = variaveis.map((it, index) => {
+                    variaveis = variaveis.map((it) => {
                         if (it?.name === target) {
                             return {
                                 ...it, valores: it.valores.filter((value) => value !== item)
@@ -328,7 +398,7 @@
                             document.querySelector('#exibirperg').innerHTML = ""
                             e.preventDefault()
                         })
-                        document.querySelector('#exibirperg').appendChild(icon)
+                        document.querySelector('#exibirperg')?.appendChild(icon)
                     }
                 });
                 list.appendChild(li);
@@ -532,7 +602,7 @@
     }
 
     function geraSelectDeResposta(valores = [], tipo, index) {
-        const options = String(tipo) === '1' ? valores.reduce((previousValue, currentValue, currentIndex, array) => (previousValue.concat(`
+        const options = String(tipo) === '1' ? valores.reduce((previousValue, currentValue) => (previousValue.concat(`
                    <option value="${currentValue}">${currentValue}</option>
             `)), '') : `
            <option value="1">sim</option>
