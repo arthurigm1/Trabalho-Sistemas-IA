@@ -99,6 +99,8 @@
 
 
     document.querySelector("#executa").onclick = () => {
+        const avancarBTN = document.getElementById("avancar")
+        avancarBTN.style.display = "block"
         localStorage.setItem("indexExecucao", "0")
         respostas = [];
         const variaveisUtilizadasNaExecucao = variaveis.filter((itVar) => {
@@ -111,9 +113,10 @@
         })
         const listaDeExecucao = document.getElementById("listaDeExecucao")
         listaDeExecucao.innerHTML = geraListaDeExecucao(variaveisUtilizadasNaExecucao)
-        const avancarBTN = document.getElementById("avancar")
+
         const perguntas = document.querySelectorAll(".carousel-item")
         avancarBTN.onclick = () => {
+
             const indexExecucao = Number(localStorage.getItem("indexExecucao"))
             const selectDaResposta = document.getElementById("respostas-" + indexExecucao)
             const respostaAtual = selectDaResposta?.multiple ? Object.values(selectDaResposta.selectedOptions)?.map(({value}) => value) : [selectDaResposta.value]
