@@ -1,60 +1,62 @@
+🌟 Sistema Especialista IA - Software de Criação de Sistemas Especialistas 🌟
+Este é um projeto de Sistema Especialista Inteligente (IA) desenvolvido com JavaScript puro. Ele visa proporcionar uma ferramenta completa para a criação e execução de sistemas especialistas, permitindo que usuários cadastrem variáveis, regras, façam inferências e obtenham explicações sobre as decisões do sistema.
 
-Sistema Especialista IA - Software de Criação de Sistemas Especialistas
-Este projeto é uma aplicação web para criação e execução de sistemas especialistas, desenvolvido utilizando JavaScript puro com armazenamento local via localStorage. O objetivo é fornecer uma ferramenta que permita aos usuários construir sistemas especialistas, cadastrar fatos, regras, e gerenciar o processo de execução de inferências.
+🎯 Objetivo
+Criar um ambiente intuitivo para desenvolver e executar sistemas especialistas, com as seguintes funcionalidades:
 
-Funcionalidades
-Cadastro de Variáveis e Valores: Permite cadastrar variáveis multivaloradas, univaloradas e numéricas, bem como seus valores.
-Cadastro de Regras e Condições: O sistema permite a criação de regras com condições e ações (então), baseado nos valores das variáveis.
-Motor de Execução de Regras: As regras são avaliadas e executadas com base nas variáveis definidas. O motor realiza a inferência, seguindo as condições definidas nas regras.
-Motor de Explicação: Permite a explicação do processo de execução das regras.
-Interação com o Usuário: O sistema solicita informações sobre variáveis e valores ao usuário, e não repete perguntas.
-Execução de Projetos Independentes: Cada projeto de sistema especialista é isolado, garantindo que um projeto não interfira no funcionamento de outro.
-Tecnologias
-JavaScript Puro: Utilizado para manipulação da lógica do sistema e interação com o DOM.
-localStorage: Banco de dados local utilizado para armazenar variáveis, regras e dados do sistema.
-HTML & CSS: Para construção da interface gráfica da aplicação.
-Bootstrap: Framework CSS para estilização da interface e responsividade.
-Como Funciona
-A aplicação possui as seguintes seções principais:
+Cadastro de Fatos e Regras
+Execução de Regras e Inferência
+Motor de Explicação
+Sistema de Perguntas sobre Fatos
+Isolamento de Projetos para evitar interferência entre eles
+🚀 Tecnologias Utilizadas
+JavaScript Puro: Manipulação lógica e interação com o DOM.
+localStorage: Banco de dados local para persistir dados de variáveis, regras e respostas.
+HTML5 & CSS3: Estruturação e estilização da interface do usuário.
+Bootstrap 5: Framework CSS para um layout moderno e responsivo.
+SweetAlert2: Para exibição de alertas e mensagens de forma elegante.
+🛠 Funcionalidades
+Cadastro de Variáveis e Valores: Defina variáveis multivaloradas, univaloradas e numéricas, com valores que o sistema irá usar para tomar decisões.
 
-Inicio: Apresentação do projeto e informações gerais.
-Variáveis: Cadastro de variáveis e seus valores, com possibilidade de atribuição de valores para cada variável.
-Regras: Definição de regras com condições e ações (então), permitindo criar a lógica do sistema especialista.
-Perguntas: Permite ao usuário cadastrar perguntas relacionadas às variáveis do sistema, para que o motor de inferência faça deduções com base nas respostas.
-Execução: Quando o sistema é executado, as regras são avaliadas e as ações são tomadas conforme a lógica definida.
-Como Usar
-Acesse o Sistema: Acesse o site em Sistema Especialista IA.
-Cadastro de Variáveis: Vá até a seção "Variáveis" e insira o nome da variável, seu tipo (multivalorada, univalorada ou numérica) e seus valores.
-Cadastro de Regras: Em "Regras", crie as condições e ações para as regras do seu sistema especialista.
-Definir Perguntas: Em "Perguntas", defina perguntas sobre as variáveis, que serão feitas ao usuário durante a execução do sistema.
-Execução do Sistema: Clique em "Executar" para iniciar a execução do sistema, onde as regras serão avaliadas e as ações realizadas.
-Resultados: O sistema exibirá os resultados com base nas regras e inferências feitas.
-Armazenamento de Dados
-O sistema utiliza o localStorage para armazenar os dados, como variáveis, valores e regras, de forma persistente no navegador. Isso garante que, mesmo após o fechamento do navegador, os dados sejam mantidos. Abaixo estão as chaves utilizadas para armazenar os dados:
+Cadastro de Regras e Condições: Crie regras complexas com condições e ações (então), permitindo modelar o comportamento do sistema especialista.
 
-variaveis: Armazena as variáveis e seus valores.
-regras: Armazena as regras definidas com as condições e ações.
-respostas: Armazena as respostas fornecidas pelo usuário.
-Exemplo de Uso
-Cadastro de Variáveis
-Nome: Temperatura
-Tipo: Numérica
-Valores: [10, 20, 30, 40]
-Cadastro de Regras
-Condição: Se a Temperatura é maior que 30
-Ação: Ligar o ar-condicionado
-Pergunta ao Usuário
-Pergunta: Qual a temperatura atual?
-Contribuições
-Se desejar contribuir para o projeto, siga estas etapas:
+Motor de Execução de Regras: O sistema avalia as regras baseadas nas variáveis e valores definidos, executando as ações apropriadas.
 
-Faça um fork do repositório.
-Crie uma branch para a sua feature (git checkout -b feature/nome-da-feature).
-Faça as alterações necessárias e adicione os arquivos alterados (git add .).
-Faça um commit com uma mensagem clara (git commit -m 'Adicionando nova funcionalidade').
-Faça um push para a sua branch (git push origin feature/nome-da-feature).
-Abra um Pull Request no repositório principal.
-License
-Este projeto está licenciado sob a MIT License - consulte o arquivo LICENSE para mais detalhes.
+Motor de Explicação: O sistema pode explicar como chegou às suas conclusões, fornecendo transparência na execução das regras.
 
-Autor: Arthur - Trabalho IA Tecnologias: JavaScript, HTML, CSS, localStorage Projeto: Sistema Especialista IA para construção e execução de sistemas especialistas.
+Sistema de Perguntas: O sistema faz perguntas ao usuário sobre variáveis, e as respostas influenciam as decisões do sistema.
+
+Isolamento de Projetos: Cada projeto de sistema especialista é mantido independente, evitando que um interfira no funcionamento de outro.
+
+🔥 Como Funciona
+A aplicação é dividida em seções principais:
+
+1. Início
+Apresentação do projeto e uma introdução ao funcionamento do sistema.
+2. Variáveis
+Cadastro de variáveis com diferentes tipos (multivaloradas, univaloradas ou numéricas).
+Defina valores associados às variáveis e indique se elas são "Objetivo" ou "Não".
+3. Regras
+Criação de regras com condições baseadas em variáveis, e ações ("Então") associadas.
+As regras são estruturadas para realizar inferência e executar a ação correta.
+4. Perguntas
+O sistema faz perguntas ao usuário para coletar informações sobre as variáveis, e com base nas respostas, o sistema faz inferências e executa as regras.
+5. Execução
+O sistema avalia as regras com base nas respostas e variáveis definidas e exibe as conclusões no modal.
+💡 Funcionalidade de Ajuda
+A aplicação oferece ajuda contextual para guiar o usuário durante o processo de criação das variáveis, regras e perguntas. Basta clicar no botão de ajuda para entender como interagir com o sistema.
+
+💾 Armazenamento de Dados
+O sistema utiliza o localStorage para armazenar todas as variáveis, regras e respostas. Isso significa que os dados persistem mesmo após o fechamento do navegador, permitindo que você retome seu trabalho a qualquer momento.
+
+📦 Instalação
+Clone o repositório ou baixe os arquivos do projeto.
+Abra o arquivo index.html no seu navegador de preferência.
+O sistema estará pronto para ser usado!
+🌐 Acesse o Sistema
+Você pode acessar a versão online do sistema no seguinte link: Projeto Sistema Especialista IA
+
+📄 Licença
+Este projeto é de código aberto e está licenciado sob a Licença MIT.
+
+Desenvolvido com 💻 e 🤖 para proporcionar uma experiência inovadora na criação de sistemas especialistas!
