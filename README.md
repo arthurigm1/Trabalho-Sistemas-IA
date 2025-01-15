@@ -51,4 +51,4 @@ Você pode acessar o projeto no seguinte link: [Projeto Sistema Especialista IA.
 
 1. **Clonar o repositório**:
    ```bash
-   git clone https://github.com/seu-usuario/sistema-especialista-ia.git
+   git clone https://github.com/arthurigm1/sistema-especialista-ia.git
